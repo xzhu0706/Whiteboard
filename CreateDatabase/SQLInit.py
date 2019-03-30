@@ -24,7 +24,7 @@ def init(cursor,type):
         cursor.execute("CREATE TABLE TakenClasses("
                        "studentID INTEGER,"
                        "coursesID INTEGER,"
-                       "grade INTEGER NOT NULL, "
+                       "grade FLOAT NOT NULL, "
                        "PRIMARY KEY (studentID,coursesID),"
                        "FOREIGN KEY (studentID) REFERENCES Users(ID),"
                        "FOREIGN KEY (coursesID) REFERENCES Courses(coursesID));")
