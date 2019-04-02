@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 import LoginPage from './components/LoginPage.js';
 import HomePage from './components/HomePage.js';
+import CoursePage from './components/CoursePage.js';
 import { BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 
 class App extends Component {
@@ -12,9 +13,10 @@ class App extends Component {
         <div className="App">
         <Router>
           <Switch>
-            <Route path="/home/:userID" component={HomePage} />
             <Route path="/" exact component={LoginPage} />
             <Route path="/login" component={LoginPage} />
+            <Route path="/home/:userID" component={HomePage} />
+            <Route path="/course/:courseID" component={CoursePage} />
           </Switch>
         </Router>
       </div>

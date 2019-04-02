@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import cookie from 'react-cookies';
 
 class LoginPage extends Component {
 	constructor(props) {
@@ -37,7 +38,10 @@ class LoginPage extends Component {
 				})).then(res => {
 					console.log(res);
 					const userID = res.data.userID;
-					console.log(userID);
+					const userType = res.data.userType;
+					console.log(userID, userType);
+					cookie.save('userID', userID, { path: '/' });
+					cookie.save('userType', userType, { path: '/'});
 					window.location = '/home/' + userID; // direct to homepage based on userID
 				});
 			} else {
