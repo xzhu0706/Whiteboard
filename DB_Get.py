@@ -6,8 +6,8 @@ from collections import defaultdict
 class getUser():
     def __init__(self):
         config = {
-            "user": 'jinchen',
-            "password": '19841036',
+            "user": '',
+            "password": '',
             "host": '127.0.0.1',
             "database": 'Whiteboard'
         }
@@ -35,7 +35,7 @@ class getUser():
 
         return -1
 
-    def get_CourseInfo(self,userID):
+    def get_Courses(self,userID):
 
         self.cursor.execute("SELECT userType FROM Users WHERE ID = %s;" %userID)
         for (userType) in self.cursor:

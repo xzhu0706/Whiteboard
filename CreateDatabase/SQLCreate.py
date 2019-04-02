@@ -61,9 +61,9 @@ def create_random_courses(cursor,num):
 #
 #     for i in range(num):
 #         studentID = random.choice(sIDs)
-#         coursesID = random.choice(cIDs)
+#         courseID = random.choice(cIDs)
 #         grade = random.randint(50,100)
-#         yield(studentID,coursesID,grade)
+#         yield(studentID,courseID,grade)
 
 
 
@@ -74,17 +74,17 @@ def create_random_takenClasses(cursor,num):
         if userType ==0:
             studentIDs.append(ID)
 
-    cursor.execute("SELECT coursesID FROM Courses;")
-    coursesIDs = []
-    for coursesID in cursor:
-        coursesIDs.append(coursesID[0])
+    cursor.execute("SELECT courseID FROM Courses;")
+    courseIDs = []
+    for courseID in cursor:
+        courseIDs.append(courseID[0])
 
     for i in range(num):
         sID = studentIDs[i%len(studentIDs)]
-        cID = coursesIDs[i//len(studentIDs)]
+        cID = courseIDs[i//len(studentIDs)]
         grade = random.randint(50, 100)
 
-        qry = "INSERT INTO TakenClasses (studentID,coursesID,grade) VALUES (%s,%s,%s);"
+        qry = "INSERT INTO TakenClasses (studentID,courseID,grade) VALUES (%s,%s,%s);"
         cursor.execute(qry, (sID,cID,grade))
 
 
@@ -92,24 +92,24 @@ def create_random_takenClasses(cursor,num):
 
 def random_assignment(num,cIDs,day):
     for _ in range(num):
-        coursesID = random.choice(cIDs)
+        courseID = random.choice(cIDs)
         deadline = datetime.datetime.now() + datetime.timedelta(days = day)
         task = 'task'
         gradeTotal = 100
-        yield (coursesID,deadline,task,gradeTotal)
+        yield (courseID,deadline,task,gradeTotal)
 
 def create_random_assignment(cursor,num,days):
-    qry = ("SELECT coursesID FROM TakenClasses;")
+    qry = ("SELECT courseID FROM TakenClasses;")
     cursor.execute(qry)
-    coursesIDs = []
-    for coursesID in cursor:
-        coursesIDs.append(coursesID[0])
+    courseIDs = []
+    for courseID in cursor:
+        courseIDs.append(courseID[0])
 
-    for info in random_assignment(num,coursesIDs,days):
-        coursesID, deadline, task, gradeTotal, *_ = info
+    for info in random_assignment(num,courseIDs,days):
+        courseID, deadline, task, gradeTotal, *_ = info
 
-        qry = "INSERT INTO Assignment (coursesID,deadline,task,gradeTotal) VALUES (%s,%s,%s,%s);"
-        cursor.execute(qry, (coursesID,deadline,task,gradeTotal))
+        qry = "INSERT INTO Assignment (courseID,deadline,task,gradeTotal) VALUES (%s,%s,%s,%s);"
+        cursor.execute(qry, (courseID,deadline,task,gradeTotal))
 
 
 
@@ -137,49 +137,49 @@ def create_random_assignmentSubmission(cursor,num):
 
 
 def create_random_gradeBook(cursor, num):
-    qry = ("SELECT studentID,coursesID,submissionID From AssignmentSubmission NATURAL JOIN TakenClasses;")
+    qry = ("SELECT studentID,courseID,submissionID From AssignmentSubmission NATURAL JOIN TakenClasses;")
     cursor.execute(qry)
 
     tuples = []
-    for (studentID,coursesID,submissionID) in cursor:
-        tuples.append((studentID,coursesID,submissionID))
+    for (studentID,courseID,submissionID) in cursor:
+        tuples.append((studentID,courseID,submissionID))
 
     for i in range(num):
         if i >= len(tuples):
             break
-        studentID, coursesID, submissionID = tuples[i]
+        studentID, courseID, submissionID = tuples[i]
         description =" description"
         grade = random.randint(50,100)
 
-        qry = "INSERT INTO GradeBook(studentID,coursesID, submissionID,description,grade) VALUES (%s,%s,%s,%s,%s);"
-        cursor.execute(qry, (studentID,coursesID, submissionID,description,grade))
+        qry = "INSERT INTO GradeBook(studentID,courseID, submissionID,description,grade) VALUES (%s,%s,%s,%s,%s);"
+        cursor.execute(qry, (studentID,courseID, submissionID,description,grade))
 
 
 
 
 def create_random_classAnnouncement(cursor,num):
-    qry = ("SELECT coursesID FROM TakenClasses;")
+    qry = ("SELECT courseID FROM TakenClasses;")
     cursor.execute(qry)
-    coursesIDs = []
-    for coursesID in cursor:
-        coursesIDs.append(coursesID[0])
+    courseIDs = []
+    for courseID in cursor:
+        courseIDs.append(courseID[0])
 
     for i in range(num):
         announcement = "announcement"
 
-        qry = "INSERT INTO ClassAnnouncement (coursesID,announcement) VALUES (%s,%s);"
-        cursor.execute(qry, (coursesIDs[random.choice(range(len(coursesIDs)))],announcement))
+        qry = "INSERT INTO ClassAnnouncement (courseID,announcement) VALUES (%s,%s);"
+        cursor.execute(qry, (courseIDs[random.choice(range(len(courseIDs)))],announcement))
 
 
 def create_random_classMaterials(cursor,num):
-    qry = ("SELECT coursesID FROM TakenClasses;")
+    qry = ("SELECT courseID FROM TakenClasses;")
     cursor.execute(qry)
-    coursesIDs = []
-    for coursesID in cursor:
-        coursesIDs.append(coursesID[0])
+    courseIDs = []
+    for courseID in cursor:
+        courseIDs.append(courseID[0])
 
     for i in range(num):
         material = "material"
 
-        qry = "INSERT INTO ClassMaterials (coursesID,material) VALUES (%s,%s);"
-        cursor.execute(qry, (coursesIDs[random.choice(range(len(coursesIDs)))],material))
+        qry = "INSERT INTO ClassMaterials (courseID,material) VALUES (%s,%s);"
+        cursor.execute(qry, (courseIDs[random.choice(range(len(courseIDs)))],material))

@@ -11,7 +11,7 @@ CORS(app, support_credentials=True)
 # given: username, password
 # return: dict of (ID, userType, firstName, lastName) if correct login
 # 		  message if login info not correct
-@app.route("/auth/login", methods=['GET'])
+@app.route("/auth/login", methods=['POST'])
 def login():
 	json_load = request.get_json()
 
@@ -34,17 +34,21 @@ def login():
 # 		  dict of list: (courseName, semester, year, courseID,professorName,professorEmail) for student
 # 		Sorted by semester and year
 # return message if no course found
-@app.route("/api/courses", methods=['GET'])
-def courseInfo():
-	json_load = request.get_json()
-	userID = json_load['userId']
-	course = gUser.get_CourseInfo(userID)
+@app.route("/api/courses/<userID>", methods=['GET'])
+def courses(userID):
+	#json_load = request.get_json()
+	#userID = json_load['userId']
+	#print("user ID is", userID)
+	course = gUser.get_Courses(userID)
 
 	if course == -1:
-		return jsonify(message="No Course Found for the professor")
+		#return jsonify(message="No Course Found for the professor")
+		return jsonify(found=False)
 	elif course == -2:
-		return jsonify(message="No Course Found for the student")
+		#return jsonify(message="No Course Found for the student")
+		return jsonify(found=False)
 	else:
+		############ TODO: return data should be an array of objects/dictionaries
 		return jsonify(course), 200
 
 

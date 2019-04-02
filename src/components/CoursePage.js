@@ -23,14 +23,17 @@ class CoursePage extends Component {
 		});
 		console.log(userType)
 
-		// load course info from API and save to states
+		// TODO: load course info from API and save to states
 
 
 		if (userType == 1) {   // userType = 1 = professor
 			if (userID != this.state.professorID) {
 				window.location = '/home/' + this.state.userID;
 			}
+			// TODO: for professor
 		}
+
+		// TODO: for student
 	}
 
 

@@ -37,11 +37,15 @@ class LoginPage extends Component {
 					status: res.status
 				})).then(res => {
 					console.log(res);
-					const userID = res.data.userID;
+					const userID = res.data.ID;
 					const userType = res.data.userType;
-					console.log(userID, userType);
+					const firstName = res.data.firstName;
+					const lastName = res.data.lastName;
+					console.log(userID, userType, firstName, lastName);
 					cookie.save('userID', userID, { path: '/' });
-					cookie.save('userType', userType, { path: '/'});
+					cookie.save('userType', userType, { path: '/' });
+					cookie.save('firstName', firstName, { path: '/' });
+					cookie.save('lastName', lastName, { path: '/' });
 					window.location = '/home/' + userID; // direct to homepage based on userID
 				});
 			} else {

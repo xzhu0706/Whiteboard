@@ -11,8 +11,8 @@ from SQLCreate import *
 from SQLQuery import *
 
 config = {
-    "user": ' ',    # your mysql username
-    "password": ' ',  # your mysql password
+    "user": '',    # your mysql username
+    "password": '',  # your mysql password
     "host": '127.0.0.1',
 }
 
@@ -98,7 +98,7 @@ def main(argv,type,num, database):
 
 
 # Set your own database name
-database = 'Whiteboard2'
+database = 'Whiteboard'
 
 table = ["Users","Courses","TakenClasses","Assignment","AssignmentSubmission","GradeBook","ClassAnnouncement","ClassMaterials"]
 action = ["init", "create","query","deleteDB"]
@@ -106,17 +106,17 @@ nums = [80,4,30,7,7,20,5,5]
 num = 5
 
 # init all table:
-# for type in table:
-#     main(action[0],type,num,database)
-#     print(type)
+for type in table:
+    main(action[0],type,num,database)
+    print(type)
 
 # Create Table
-# for i in range(8):
-#     main(action[1], table[i], nums[i],database)
-#     print(table[i])
+for i in range(8):
+    main(action[1], table[i], nums[i],database)
+    print(table[i])
 
 # Query from Database
-# for i in range(8):
-#     print(table[i])
-#     main(action[2], table[i], nums[i],database)
+for i in range(8):
+    print(table[i])
+    main(action[2], table[i], nums[i],database)
 

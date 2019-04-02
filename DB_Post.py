@@ -6,8 +6,8 @@ from collections import defaultdict
 class postUser():
     def __init__(self):
         config = {
-            "user": 'jinchen',
-            "password": '19841036',
+            "user": '',
+            "password": '',
             "host": '127.0.0.1',
             "database": 'Whiteboard'
         }

@@ -13,7 +13,7 @@ def init(cursor,type):
     elif type == "Courses":
         cursor.execute("DROP TABLE IF EXISTS Courses;")
         cursor.execute("CREATE TABLE Courses("
-                       "coursesID INTEGER PRIMARY KEY AUTO_INCREMENT,"
+                       "courseID INTEGER PRIMARY KEY AUTO_INCREMENT,"
                        "courseName VARCHAR(128),"
                        "semester VARCHAR(128), "
                        "year INTEGER, "
@@ -23,22 +23,22 @@ def init(cursor,type):
         cursor.execute("DROP TABLE IF EXISTS TakenClasses;")
         cursor.execute("CREATE TABLE TakenClasses("
                        "studentID INTEGER,"
-                       "coursesID INTEGER,"
-                       "grade FLOAT NOT NULL, "
-                       "PRIMARY KEY (studentID,coursesID),"
+                       "courseID INTEGER,"
+                       "grade FLOAT, "
+                       "PRIMARY KEY (studentID,courseID),"
                        "FOREIGN KEY (studentID) REFERENCES Users(ID),"
-                       "FOREIGN KEY (coursesID) REFERENCES Courses(coursesID));")
+                       "FOREIGN KEY (courseID) REFERENCES Courses(courseID));")
     elif type == "Assignment":
         cursor.execute("DROP TABLE IF EXISTS Assignment;")
         cursor.execute("CREATE TABLE Assignment("
                        "AssignID INTEGER PRIMARY KEY AUTO_INCREMENT,"
-                       "coursesID INTEGER,"
+                       "courseID INTEGER,"
                        "deadline TIMESTAMP, "
                        "task VARCHAR(256), "
                        "gradeTotal INTEGER,"
                        "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                        # "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-                       "FOREIGN KEY (coursesID) REFERENCES Courses(coursesID));")
+                       "FOREIGN KEY (courseID) REFERENCES Courses(courseID));")
     elif type == "AssignmentSubmission":
         cursor.execute("DROP TABLE IF EXISTS AssignmentSubmission;")
         cursor.execute("CREATE TABLE AssignmentSubmission("
@@ -56,30 +56,30 @@ def init(cursor,type):
         cursor.execute("CREATE TABLE GradeBook("
                        "gradeID INTEGER PRIMARY KEY AUTO_INCREMENT,"
                        "StudentID INTEGER,"
-                       "coursesID INTEGER,"
+                       "courseID INTEGER,"
                        "submissionID INTEGER,"
                        "description VARCHAR(128), "
                        "grade INTEGER,"
                        "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                        "FOREIGN KEY (submissionID) REFERENCES AssignmentSubmission(submissionID),"
-                       "FOREIGN KEY (studentID,coursesID) REFERENCES TakenClasses(studentID,coursesID));")
+                       "FOREIGN KEY (studentID,courseID) REFERENCES TakenClasses(studentID,courseID));")
     elif type == "ClassAnnouncement":
         cursor.execute("DROP TABLE IF EXISTS ClassAnnouncement;")
         cursor.execute("CREATE TABLE ClassAnnouncement("
                        "announcementID INTEGER PRIMARY KEY AUTO_INCREMENT,"
-                       "coursesID INTEGER,"
+                       "courseID INTEGER,"
                        "announcement VARCHAR(256), "
                        "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-                       "FOREIGN KEY (coursesID) REFERENCES Courses(coursesID));")
+                       "FOREIGN KEY (courseID) REFERENCES Courses(courseID));")
 
     elif type == "ClassMaterials":
         cursor.execute("DROP TABLE IF EXISTS ClassMaterials;")
         cursor.execute("CREATE TABLE ClassMaterials("
                        "materialID INTEGER PRIMARY KEY AUTO_INCREMENT,"
-                       "coursesID INTEGER,"
+                       "courseID INTEGER,"
                        "material VARCHAR(256), "
                        "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-                       "FOREIGN KEY (coursesID) REFERENCES Courses(coursesID));")
+                       "FOREIGN KEY (courseID) REFERENCES Courses(courseID));")
     else:
         print(f"Unknown Typle : {type}")
 
