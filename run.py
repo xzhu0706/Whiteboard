@@ -47,7 +47,7 @@ def courses(userID):
 # return:
 # 		  list of dict: (courseName, semester, year,professorName,professorEmail)
 # 		  found=False if no course found
-@app.route("/api/courseinfo/<courseID>", methods=['GET'])
+@app.route("/api/courseInfo/<courseID>", methods=['GET'])
 def courseInfo(courseID):
 	course = gUser.get_courseInfo(courseID)
 
@@ -97,10 +97,10 @@ def createMaterial():
 # 		found=False if No Annocement Found
 @app.route("/api/announcement/<courseID>", methods=['GET'])
 def announcementInfo(courseID):
-	announcementList = gUser.get_Annocement(courseID)
+	announcementList = gUser.get_Announcement(courseID)
 
 	if announcementList == -1:
-		return jsonify(found=False), 404
+		return jsonify(found=False)
 	else:
 		return jsonify(announcementList), 200
 
@@ -246,7 +246,7 @@ if __name__ == "__main__":
 		"user": '',
 		"password": '',
 		"host": '127.0.0.1',
-		"database": 'Whiteboard3'
+		"database": 'Whiteboard'
 	}
 	gUser = getUser(config)
 	pUser = postUser(config)

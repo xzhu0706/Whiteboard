@@ -31,3 +31,16 @@
     transform: rotate(360deg);
   }
 }
+
+.announcement-section {
+  max-width: 600px;
+}
+
+.side-bar {
+  max-width: 200px;
+}
+
+.side-bar-button {
+  margin: 5px;
+  display: block;
+}

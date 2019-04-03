@@ -8,8 +8,8 @@ class HomePage extends Component {
 		this.state = {
 			userID: 0,
 			firstName: '',
-			lastName: ''
-			// maybe more stuff...
+			lastName: '',
+			courses: []
 		}
 
 	}
@@ -29,15 +29,20 @@ class HomePage extends Component {
 						status: res.status
 					})).then(res => {
 						console.log(res);
-						if (res.data.found == false) {
-							console.log("courses not found");
-							//TODO: show no course is found for user 
 
-						} else {
-							console.log("courses found");
-							//TODO: need array of objects from backend to use map function
+						const courses = res.data.map((course) => {
+							return (
+								<h2 
+									onClick={(e) => {window.location = '/course/' + course.courseID}} 
+									key={course.courseID} 
+									// className="" for styling later
+								>
+									{course.courseName} {course.semester} {course.year} 
+								</h2>
+							)
+						})
+						this.setState({ courses });
 
-						}
 					});
 				} else {
 						console.log('error while fetching courses');
@@ -50,8 +55,8 @@ class HomePage extends Component {
 		return (
 			<div>
 				<h1>Welcome to your home page, {this.state.firstName} {this.state.lastName}!</h1>
-
-				{/* TODO: fetch courses and list them out */}
+				
+				{this.state.courses == [] ? <h2>No courses found</h2> : this.state.courses }
 
 			</div>
 		);

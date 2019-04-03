@@ -1,48 +1,108 @@
 import React, {Component} from 'react';
 import cookie from 'react-cookies';
+import Announcements from './Annoucements.js';
+import SideBar from './SideBar.js';
 
 class CoursePage extends Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			professorID: 3,
 			userID: 0,
 			userType: 3,
+			professorID: 0,
+			courseName: '',
+			semester: '',
+			year: '',
+			professorEmail: '',
+			professorName: '',
+			announcements: []
 			// maybe more stuff...
 		}
 
 	}
 
-	componentDidMount() {
+	async componentDidMount() {
 		let userID = cookie.load('userID');
 		let userType = cookie.load('userType');
-		this.setState({
-			userID: userID,
-			userType: userType,
-		});
-		console.log(userType)
+		this.setState({ userID, userType });
 
-		// TODO: load course info from API and save to states
+		const params = this.props.match.params; // get params from url
+    console.log(params);
+
+		await fetch('http://localhost:5000/api/courseInfo/' + params.courseID)
+			.then((res) => {
+				console.log(res);
+				if (res.ok) {
+					res.json().then(data => ({
+						data: data,
+						status: res.status
+					})).then(res => {
+						console.log(res);
+						let key;
+						for (key in res.data) {
+							this.setState({ [key]: res.data[key] });
+						}
+					});
+				} else {
+						console.log('error while fetching courseInfo');
+					}
+			})
+
+		await fetch('http://localhost:5000/api/announcement/' + params.courseID)
+			.then((res) => {
+				console.log(res);
+				if (res.ok) {
+					res.json().then(data => ({
+						data: data,
+						status: res.status
+					})).then(res => {
+						console.log(res);
+						const announcements = <Announcements announcements={res.data} />
+						this.setState({ announcements });
+					});
+				} else {
+						console.log('error while fetching announcement');
+					}
+			});
 
 
-		if (userType == 1) {   // userType = 1 = professor
-			if (userID != this.state.professorID) {
-				window.location = '/home/' + this.state.userID;
-			}
-			// TODO: for professor
-		}
+		// if (userType == 1) {   // userType = 1 = professor
+		// 	if (userID != this.state.professorID) {
+		// 		window.location = '/home/' + this.state.userID;
+		// 	}
+		// 	// TODO: for professor
+		// }
 
-		// TODO: for student
+		// // TODO: for student
 	}
 
 
 
 	render() {
 		return (
-			<div>
-				<h1> Course Page </h1>
-				<h2> id: {this.state.userID ? this.state.userID : 'nothing'}</h2>
+			<div className="container-fluid">
+
+				<h1 className="course-page-header"> 
+					{this.state.courseName} {this.state.semester} {this.state.year} 
+				</h1>
+
+				<div className="professor-contact-info">
+					<h3>{this.state.professorName}</h3>
+					<h3>{this.state.professorEmail}</h3>
+				</div>
+
+				<div className="row">
+					<div className="col-sm-4 d-flex justify-content-end">
+						<SideBar />
+					</div>
+					<div className="col-sm-8">
+						{this.state.announcements}
+					</div>
+				</div>
+
+
+
 			</div>
 
 		);

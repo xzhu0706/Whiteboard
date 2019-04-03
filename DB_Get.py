@@ -64,6 +64,7 @@ class getUser():
             courseInfo['courseName'] = courseName
             courseInfo['semester'] = semester
             courseInfo['year'] = year
+            courseInfo['professorID'] = professorID
             courseInfo['professorName'] = firstName + " " + lastName
             courseInfo['professorEmail'] = email
 
@@ -85,14 +86,14 @@ class getUser():
             return -1
         return materialInfo
 
-    def get_Annocement(self, courseID):
+    def get_Announcement(self, courseID):
         qry = "SELECT announcementID, announcement,postTime " \
               "FROM ClassAnnouncement WHERE courseID = %(courseID)s ORDER BY postTime ASC;"
         self.cursor.execute(qry, {"courseID": courseID})
 
         announcementInfo = []
         for (announcementID, content, postTime) in self.cursor:
-            announcementInfo.append({'announcementID': announcementID, 'material': content,
+            announcementInfo.append({'announcementID': announcementID, 'announcement': content,
                                      'postTime': postTime.strftime("%m/%d/%Y, %H:%M:%S")})
         if not announcementInfo:
             return -1

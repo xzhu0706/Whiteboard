@@ -14,7 +14,7 @@ config = {
     "host": '127.0.0.1',
 }
 # Set your own database name
-database = 'Whiteboard3'
+database = 'Whiteboard'
 
 def create_type(type,cursor,num):
     if type == "Users":
