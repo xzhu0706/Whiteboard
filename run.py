@@ -2,6 +2,7 @@ from flask import Flask, jsonify,request
 from flask_cors import CORS
 from DB_Get import getUser
 from DB_Post import postUser
+import datetime
 
 app = Flask(__name__)
 CORS(app, support_credentials=True)
@@ -18,72 +19,146 @@ def login():
 	username = json_load['username']
 	password = json_load['password']
 
-	# print("Username %s, Password %s"% (username,password))
-
 	id_type = gUser.login_check(username, password)
 
 	if id_type != -1:
 		return jsonify(id_type), 200
 	else:
-		return jsonify(authorization=False, message = "Wrong username or password"), 403
+		return jsonify(authorization=False, message="Wrong username or password"), 403
 
 
-# @app.route("/api/courses", methods=['GET'])
+# @app.route("/api/courses/<userID>", methods=['GET'])
 # given: userId
-# return: dict of list: (courseName, semester, year, courseID) for professor
-# 		  dict of list: (courseName, semester, year, courseID,professorName,professorEmail) for student
+# return: list of dict: (courseID, courseName, semester, year) for both prof and student
 # 		Sorted by semester and year
-# return message if no course found
+# 		found=False if no course found
 @app.route("/api/courses/<userID>", methods=['GET'])
 def courses(userID):
-	#json_load = request.get_json()
-	#userID = json_load['userId']
-	#print("user ID is", userID)
-	course = gUser.get_Courses(userID)
+	courseList = gUser.get_Courses(userID)
+
+	if courseList == -1:
+		return jsonify(found=False), 404
+	else:
+		return jsonify(courseList), 200
+
+
+# @app.route("/api/courseinfo/<courseID>", methods=['GET'])
+# given: userId
+# return:
+# 		  list of dict: (courseName, semester, year,professorName,professorEmail)
+# 		  found=False if no course found
+@app.route("/api/courseinfo/<courseID>", methods=['GET'])
+def courseInfo(courseID):
+	course = gUser.get_courseInfo(courseID)
 
 	if course == -1:
-		#return jsonify(message="No Course Found for the professor")
-		return jsonify(found=False)
-	elif course == -2:
-		#return jsonify(message="No Course Found for the student")
-		return jsonify(found=False)
+		return jsonify(found=False), 404
 	else:
-		############ TODO: return data should be an array of objects/dictionaries
 		return jsonify(course), 200
 
 
-# @app.route("/api/materials", methods=['GET'])
+# @app.route("/api/materials/<courseID>", methods=['GET'])
 # given: courseId
-# return: dict of list: (material, time) for materials for that courseId (sort by time)
-# 		  message if No Material Found
-@app.route("/api/materials", methods=['GET'])
-def materialInfo():
-	json_load = request.get_json()
-	courseID = json_load['courseId']
+# return:
+# 		list of dict: (materialID, material, postTime) for that courseID
+# 		(sort by postTime)
+# 		found=False if No Material Found
+@app.route("/api/materials/<courseID>", methods=['GET'])
+def materialInfo(courseID):
 
-	material = gUser.get_Materials(courseID)
-	if material != -1:
-		return jsonify(material), 200
+	materialList = gUser.get_Materials(courseID)
+	if materialList != -1:
+		return jsonify(found=False), 404
 	else:
-		return jsonify(message = "No Material Found")
+		return jsonify(materialList), 200
 
 
 
-# @app.route("/api/assignments", methods=['GET])
+# @app.route("/api/createMaterial", methods=['POST'])
+# given: courseId, material
+# return: boolean of success or not of updating DB
+@app.route("/api/createMaterial", methods=['POST'])
+def createMaterial():
+	json_load = request.get_json()
+	courseID = json_load['courseID']
+	material = json_load['material']
+
+	# boolean value of update in DB or not
+	boolean = pUser.uploadMaterial(courseID,material)
+
+	return jsonify(update=boolean)
+
+
+# @app.route("/api/announcement/<courseID>", methods=['GET'])
 # given: courseId
-# return: dict of list: (assignID, deadline, task, gradeTotal, postTime) that courseId (sort by time)
-# 		  message if No Assignment Found
-@app.route("/api/assignments", methods=['GET'])
-def assignmentInfo():
-	json_load = request.get_json()
-	courseID = json_load['courseId']
+# return:
+# 		list of dict: (announcementID, announcement, postTime) for that courseID
+# 		(sort by postTime)
+# 		found=False if No Annocement Found
+@app.route("/api/announcement/<courseID>", methods=['GET'])
+def announcementInfo(courseID):
+	announcementList = gUser.get_Annocement(courseID)
 
-	assignment = gUser.get_Assignments(courseID)
-	if assignment != -1:
-		return jsonify(assignment), 200
+	if announcementList == -1:
+		return jsonify(found=False), 404
 	else:
-		return jsonify(message = "No Assignment Found")
+		return jsonify(announcementList), 200
 
+
+# @app.route("/api/createAnnocement", methods=['POST'])
+# given: courseId, material
+# return: boolean of success or not of updating DB
+@app.route("/api/createAnnocement", methods=['POST'])
+def createAnnocement():
+	json_load = request.get_json()
+	courseID = json_load['courseID']
+	announcement = json_load['announcement']
+
+	# boolean value of update in DB or not
+	boolean = pUser.makeAnnouncement(courseID,announcement)
+
+	return jsonify(update=boolean)
+
+
+
+
+# @app.route("/api/assignments/<courseID>", methods=['GET])
+# given: courseId
+# return: dict of list: (assignID, task, gradeTotal,deadline, postTime) of that courseId
+# 		(sort by postTime)
+# 		found=False if No Assignment Found
+@app.route("/api/assignments/<courseID>", methods=['GET'])
+def assignmentInfo(courseID):
+	assignmentList = gUser.get_Assignments(courseID)
+
+	if assignmentList == -1:
+		return jsonify(found=False), 404
+	else:
+		return jsonify(assignmentList), 200
+
+
+# @app.route("/api/createAssignment", methods=['POST'])
+# given: userId, courseId, task, deadline, gradeTotal
+# return: boolean of success or not of updating DB
+@app.route("/api/createAssignment", methods=['POST'])
+def createAss():
+	json_load = request.get_json()
+	courseID = json_load['courseID']
+	task = json_load['task']
+	# for deadline: just give n day after current day
+	deadlineDay = json_load['deadline']
+	deadline = datetime.datetime.combine(datetime.date.today()+datetime.timedelta(days=deadlineDay), datetime.time.max)
+
+	gradeTotal = json_load['gradeTotal']
+
+	# boolean value of update in DB or not
+	boolean = pUser.createAssignment(courseID,deadline,task,gradeTotal)
+
+	return jsonify(update=boolean)
+
+
+# #############################################
+# Below still need modify
 
 # @app.route("/api/grades", methods=['GET'])
 # given: userId & courseId
@@ -138,31 +213,8 @@ def submitAss():
 	return jsonify(message = message)
 
 
-# @app.route("/api/create_assign", methods=['POST'])
-# given: userId, courseId, task, due date, gradeTotal
-# return: message of success or not of updating DB
-@app.route("/api/create_assign", methods=['POST'])
-def createAss():
-	json_load = request.get_json()
-	courseID = json_load['courseId']
-	task = json_load['task']
-	deadline = json_load['deadline']
-	gradeTotal = json_load['gradeTotal']
 
-	message = pUser.create_Assignment(courseID,deadline,task,gradeTotal)
-	return jsonify(message=message)
 
-# @app.route("/api/create_material", methods=['POST'])
-# given: courseId, file (maybe more)
-# return: message of success or not of updating DB
-app.route("/api/create_material", methods=['POST'])
-def createMaterial():
-	json_load = request.get_json()
-	courseID = json_load['courseId']
-	material = json_load['material']
-
-	message = pUser.create_Material(courseID,material)
-	return jsonify(message=message)
 
 
 
@@ -190,6 +242,12 @@ def postGrade():
 
 
 if __name__ == "__main__":
-	gUser = getUser()
-	pUser = postUser()
+	config = {
+		"user": '',
+		"password": '',
+		"host": '127.0.0.1',
+		"database": 'Whiteboard3'
+	}
+	gUser = getUser(config)
+	pUser = postUser(config)
 	app.run()

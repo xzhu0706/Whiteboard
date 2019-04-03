@@ -1,87 +1,80 @@
+def init(cursor,database):
+    cursor.execute("CREATE DATABASE IF NOT EXISTS %s;" % database)
+    cursor.execute("USE %s;" % database)
 
-def init(cursor,type):
-    if type == "Users":
-        cursor.execute("DROP TABLE IF EXISTS Users;")
-        cursor.execute("CREATE TABLE Users("
-                       "ID INTEGER PRIMARY KEY AUTO_INCREMENT, "
-                       "userName VARCHAR(128) NOT NULL UNIQUE,"
-                       "password VARCHAR(128) NOT NULL,"
-                       "email VARCHAR(128), "
-                       "firstName VARCHAR(128), "
-                       "lastName VARCHAR(128),"
-                       "userType INTEGER NOT NULL);")
-    elif type == "Courses":
-        cursor.execute("DROP TABLE IF EXISTS Courses;")
-        cursor.execute("CREATE TABLE Courses("
-                       "courseID INTEGER PRIMARY KEY AUTO_INCREMENT,"
-                       "courseName VARCHAR(128),"
-                       "semester VARCHAR(128), "
-                       "year INTEGER, "
-                       "professorID INTEGER,"
-                       "FOREIGN KEY (professorID) REFERENCES Users(ID));")
-    elif type =="TakenClasses":
-        cursor.execute("DROP TABLE IF EXISTS TakenClasses;")
-        cursor.execute("CREATE TABLE TakenClasses("
+    cursor.execute("CREATE TABLE Users("
+                   "ID INTEGER PRIMARY KEY AUTO_INCREMENT, "
+                   "userName VARCHAR(40) NOT NULL UNIQUE, "
+                   "password VARCHAR(40) NOT NULL, "
+                   "email VARCHAR(80), "
+                   "firstName VARCHAR(40), "
+                   "lastName VARCHAR(40),"
+                   "userType INTEGER NOT NULL);")
+    cursor.execute("CREATE TABLE Courses( "
+                   "courseID INTEGER PRIMARY KEY AUTO_INCREMENT, "
+                   "courseName VARCHAR(40), "
+                   "semester VARCHAR(40),"
+                   "year INTEGER,"
+                   "professorID INTEGER,"
+                   "FOREIGN KEY (professorID) REFERENCES Users(ID)"
+                   ");")
+    cursor.execute("CREATE TABLE TakenClasses("
                        "studentID INTEGER,"
                        "courseID INTEGER,"
                        "grade FLOAT, "
                        "PRIMARY KEY (studentID,courseID),"
                        "FOREIGN KEY (studentID) REFERENCES Users(ID),"
                        "FOREIGN KEY (courseID) REFERENCES Courses(courseID));")
-    elif type == "Assignment":
-        cursor.execute("DROP TABLE IF EXISTS Assignment;")
-        cursor.execute("CREATE TABLE Assignment("
-                       "AssignID INTEGER PRIMARY KEY AUTO_INCREMENT,"
+    cursor.execute("CREATE TABLE Assignment("
+                       "assignID INTEGER PRIMARY KEY AUTO_INCREMENT,"
                        "courseID INTEGER,"
                        "deadline TIMESTAMP, "
                        "task VARCHAR(256), "
                        "gradeTotal INTEGER,"
-                       "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-                       # "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-                       "FOREIGN KEY (courseID) REFERENCES Courses(courseID));")
-    elif type == "AssignmentSubmission":
-        cursor.execute("DROP TABLE IF EXISTS AssignmentSubmission;")
-        cursor.execute("CREATE TABLE AssignmentSubmission("
+                       "postTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+                       "FOREIGN KEY (courseID) REFERENCES Courses(courseID) ON DELETE CASCADE);")
+    cursor.execute("CREATE TABLE AssignmentSubmission("
                        "submissionID INTEGER PRIMARY KEY AUTO_INCREMENT,"
-                       "studentID INTEGER NOT NULL,"
-                       "assignID INTEGER NOT NULL,"
+                       "studentID INTEGER,"
+                       "assignID INTEGER,"
                        "isGraded INTEGER,"
                        "file VARCHAR(256), "
-                       "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-                       # "PRIMARY KEY (submissionID,studentID),"
+                       "uploadTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                        "FOREIGN KEY (studentID) REFERENCES Users(ID),"
                        "FOREIGN KEY (assignID) REFERENCES Assignment(assignID));")
-    elif type == "GradeBook":
-        cursor.execute("DROP TABLE IF EXISTS GradeBook;")
-        cursor.execute("CREATE TABLE GradeBook("
+    cursor.execute("CREATE TABLE Exam("
+                       "examID INTEGER PRIMARY KEY AUTO_INCREMENT,"
+                       "courseID INTEGER,"
+                       "gradeTotal INTEGER,"
+                       "description VARCHAR(128),"
+                       "examDay TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+                       "FOREIGN KEY (courseID) REFERENCES Courses(courseID));")
+
+    cursor.execute("CREATE TABLE GradeBook("
                        "gradeID INTEGER PRIMARY KEY AUTO_INCREMENT,"
                        "StudentID INTEGER,"
-                       "courseID INTEGER,"
+                       "examID INTEGER,"
                        "submissionID INTEGER,"
-                       "description VARCHAR(128), "
-                       "grade INTEGER,"
-                       "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+                       "grade FLOAT,"
+                       "gradeTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                        "FOREIGN KEY (submissionID) REFERENCES AssignmentSubmission(submissionID),"
-                       "FOREIGN KEY (studentID,courseID) REFERENCES TakenClasses(studentID,courseID));")
-    elif type == "ClassAnnouncement":
-        cursor.execute("DROP TABLE IF EXISTS ClassAnnouncement;")
-        cursor.execute("CREATE TABLE ClassAnnouncement("
+                       "FOREIGN KEY (studentID) REFERENCES Users(ID),"
+                       "FOREIGN KEY (examID) REFERENCES Exam(examID));")
+
+    cursor.execute("CREATE TABLE ClassAnnouncement("
                        "announcementID INTEGER PRIMARY KEY AUTO_INCREMENT,"
                        "courseID INTEGER,"
                        "announcement VARCHAR(256), "
-                       "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+                       "postTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                        "FOREIGN KEY (courseID) REFERENCES Courses(courseID));")
 
-    elif type == "ClassMaterials":
-        cursor.execute("DROP TABLE IF EXISTS ClassMaterials;")
-        cursor.execute("CREATE TABLE ClassMaterials("
+    cursor.execute("CREATE TABLE ClassMaterials("
                        "materialID INTEGER PRIMARY KEY AUTO_INCREMENT,"
                        "courseID INTEGER,"
                        "material VARCHAR(256), "
-                       "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+                       "postTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                        "FOREIGN KEY (courseID) REFERENCES Courses(courseID));")
-    else:
-        print(f"Unknown Typle : {type}")
+
 
 
 

@@ -2,8 +2,6 @@
 # If you don't have mysql.connect library
 # Run `pip install mysql-connector` to install
 
-
-import sys
 import mysql.connector
 from mysql.connector import errorcode
 from SQLInit import init
@@ -15,7 +13,8 @@ config = {
     "password": '',  # your mysql password
     "host": '127.0.0.1',
 }
-
+# Set your own database name
+database = 'Whiteboard3'
 
 def create_type(type,cursor,num):
     if type == "Users":
@@ -28,12 +27,15 @@ def create_type(type,cursor,num):
         create_random_assignment(cursor, num,7)
     elif type =="AssignmentSubmission":
         create_random_assignmentSubmission(cursor,num)
+    elif type == "Exam":
+        create_random_exam(cursor, num)
     elif type == "GradeBook":
         create_random_gradeBook(cursor, num)
     elif type == "ClassAnnouncement":
         create_random_classAnnouncement(cursor, num)
     elif type == "ClassMaterials":
         create_random_classMaterials(cursor,num)
+
     else:
         print(f"Unknown Typle : {type}")
 
@@ -49,6 +51,8 @@ def query_type(type,cursor):
         query_assignment(cursor)
     elif type =="AssignmentSubmission":
         query_assignmentSubmission(cursor)
+    elif type == "Exam":
+        query_exam(cursor)
     elif type == "GradeBook":
         query_gradeBook(cursor)
     elif type =="ClassAnnouncement":
@@ -61,18 +65,12 @@ def query_type(type,cursor):
 
 
 def main(argv,type,num, database):
-    if argv not in {"init", "create", "query","deleteDB"}:
-        print(f"USAGE: {argv} (init|create|query)")
-        sys.exit(-1)
-
     try:
         cnx = mysql.connector.connect(**config)
         cursor = cnx.cursor(buffered=True)
         if argv == "init":
-            cursor.execute("CREATE DATABASE IF NOT EXISTS %s;" % database)
-            cursor.execute("USE %s;" % database)
             print("init")
-            init(cursor,type)
+            init(cursor, database)
             cnx.commit()        # Make sure data is committed to the database
         elif argv == "create":
             print("create")
@@ -84,7 +82,8 @@ def main(argv,type,num, database):
             cursor.execute("USE %s;" % database)
             query_type(type, cursor)
         else:
-            cursor.execute("DROP DATABASE %s;" % database)
+            print("Drop Database")
+            cursor.execute("DROP DATABASE IF EXISTS %s;" % database)
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             print("Something is wrong with your user name or password")
@@ -97,26 +96,26 @@ def main(argv,type,num, database):
         cnx.close()
 
 
-# Set your own database name
-database = 'Whiteboard'
 
-table = ["Users","Courses","TakenClasses","Assignment","AssignmentSubmission","GradeBook","ClassAnnouncement","ClassMaterials"]
+
+table = ["Users","Courses","TakenClasses","Assignment","AssignmentSubmission","Exam","GradeBook","ClassAnnouncement","ClassMaterials"]
 action = ["init", "create","query","deleteDB"]
-nums = [80,4,30,7,7,20,5,5]
+nums = [70,4,80,10,30,10,30,6,6]
 num = 5
 
-# init all table:
-for type in table:
-    main(action[0],type,num,database)
-    print(type)
+main("",type,num,database)
+
+# init database and all table:
+main(action[0],type,num,database)
+
 
 # Create Table
-for i in range(8):
+for i in range(9):
     main(action[1], table[i], nums[i],database)
     print(table[i])
 
 # Query from Database
-for i in range(8):
+for i in range(9):
     print(table[i])
     main(action[2], table[i], nums[i],database)
 

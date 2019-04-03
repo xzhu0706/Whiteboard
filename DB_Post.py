@@ -4,13 +4,8 @@ from collections import defaultdict
 # from datetime import datetime
 
 class postUser():
-    def __init__(self):
-        config = {
-            "user": '',
-            "password": '',
-            "host": '127.0.0.1',
-            "database": 'Whiteboard'
-        }
+    def __init__(self,config):
+
         try:
             self.cnx = mysql.connector.connect(**config)
             self.cursor = self.cnx.cursor(buffered=True)
@@ -23,6 +18,41 @@ class postUser():
                 print(err)
             raise err
 
+    def uploadMaterial(self,courseID,material):
+        qry = "INSERT INTO ClassMaterials (courseID,material) VALUES (%s,%s);"
+        try:
+            self.cursor.execute(qry, (courseID,material))
+            self.cnx.commit()  # Make sure data is committed to the database
+            return True
+        except mysql.connector.Error as err:
+            print(err)
+            return False
+
+
+    def makeAnnouncement(self,courseID,announcement):
+        qry = "INSERT INTO ClassAnnouncement (courseID,announcement) VALUES (%s,%s);"
+        try:
+            self.cursor.execute(qry, (courseID,announcement))
+            self.cnx.commit()  # Make sure data is committed to the database
+            return True
+        except mysql.connector.Error as err:
+            return False
+
+    def createAssignment(self,courseID,deadline,task,gradeTotal):
+        qry = "INSERT INTO Assignment (courseID,deadline,task,gradeTotal) " \
+              "VALUES (%s,%s,%s,%s);"
+        try:
+            self.cursor.execute(qry, (courseID,deadline,task,gradeTotal))
+            self.cnx.commit()  # Make sure data is committed to the database
+            return True
+        except mysql.connector.Error:
+            return False
+
+
+
+################################
+    # Below still need modify
+
     def create_Submission(self,studentID,assignID,file):
         isGraded = 0
         qry = "INSERT INTO AssignmentSubmission(studentID,assignID,isGraded,file) VALUES (%s,%s,%s,%s);"
@@ -33,23 +63,9 @@ class postUser():
         except mysql.connector.Error as err:
             return "Upload Submission Failed"
 
-    def create_Assignment(self,courseID,deadline,task,gradeTotal):
-        qry = "INSERT INTO Assignment (coursesID,deadline,task,gradeTotal) VALUES (%s,%s,%s,%s);"
-        try:
-            self.cursor.execute(qry, (courseID,deadline,task,gradeTotal))
-            self.cnx.commit()  # Make sure data is committed to the database
-            return "Assignment Create Success"
-        except mysql.connector.Error as err:
-            return "Assignment Create Failed"
 
-    def create_Material(self,courseID,material):
-        qry = "INSERT INTO ClassMaterials (coursesID,material) VALUES (%s,%s);"
-        try:
-            self.cursor.execute(qry, (courseID,material))
-            self.cnx.commit()  # Make sure data is committed to the database
-            return "Upload Material Success"
-        except mysql.connector.Error as err:
-            return "Upload Material Failed"
+
+
 
     def assign_grade(self,studentID,submissionID,courseID,grade,description):
 
@@ -84,7 +100,7 @@ class postUser():
 
 
             finalgrade = currentGrade/totalGrade * 100
-            qry = "INSERT INTO TakenClasses (studentID,coursesID,grade) VALUES (%s,%s,%s)" \
+            qry = "INSERT INTO TakenClasses (studentID,courseID,grade) VALUES (%s,%s,%s)" \
                   "ON DUPLICATE KEY UPDATE grade = %s "
             self.cursor.execute(qry, (studentID,courseID, finalgrade,finalgrade))
 

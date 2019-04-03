@@ -1,16 +1,12 @@
 import mysql.connector
 from mysql.connector import errorcode
 from collections import defaultdict
+
+
 # from datetime import datetime
 
 class getUser():
-    def __init__(self):
-        config = {
-            "user": '',
-            "password": '',
-            "host": '127.0.0.1',
-            "database": 'Whiteboard'
-        }
+    def __init__(self, config):
         try:
             self.cnx = mysql.connector.connect(**config)
             self.cursor = self.cnx.cursor(buffered=True)
@@ -23,102 +19,119 @@ class getUser():
                 print(err)
             raise err
 
-
-    def login_check(self,username,password):
+    def login_check(self, username, password):
 
         qry = "SELECT ID, userType, firstName, lastName FROM Users WHERE userName = %s AND password= %s ;"
-        self.cursor.execute(qry,(username,password))
+        self.cursor.execute(qry, (username, password))
 
-        for (ID, userType,firstName, lastName) in self.cursor:
+        for (ID, userType, firstName, lastName) in self.cursor:
             # print("ID = {:d}, userType={:d}".format(ID, userType))
-            return {"ID":ID, "userType":userType, "firstName":firstName,"lastName":lastName }
+            return {"ID": ID, "userType": userType, "firstName": firstName, "lastName": lastName}
 
         return -1
 
-    def get_Courses(self,userID):
-
-        self.cursor.execute("SELECT userType FROM Users WHERE ID = %s;" %userID)
+    def get_Courses(self, userID):
+        self.cursor.execute("SELECT userType FROM Users WHERE ID = %s;" % userID)
         for (userType) in self.cursor:
             uType = userType[0]
 
-        if uType == 1:       #Professor
-            qry = "SELECT coursesID, courseName,semester,year FROM Courses " \
-                  "WHERE professorID = %(userID)s ORDER BY year ASC,semester DESC;"
-            self.cursor.execute(qry,{"userID":userID})
+        if uType == 1:  # Professor
+            self.cursor.execute("SELECT courseID, courseName,semester,year "
+                                "FROM Courses WHERE professorID = %s "
+                                "ORDER BY year ASC,semester DESC;" % userID)
+        else:  # student
+            self.cursor.execute("SELECT courseID, courseName,semester,year "
+                                "FROM Courses NATURAL JOIN TakenClasses "
+                                "WHERE studentID = %s "
+                                "ORDER BY year ASC,semester DESC;" % userID)
+        coursesInfo = []
+        for (courseID, courseName, semester, year) in self.cursor:
+            coursesInfo.append({'courseID': courseID, 'courseName': courseName,
+                                'semester': semester, 'year': year})
 
-            courseInfo = defaultdict(list)
-            for (courseID, courseName,semester,year) in self.cursor:
-                courseInfo['courseName'].append(courseName)
-                courseInfo['semester'].append(semester)
-                courseInfo['year'].append(year)
-                courseInfo['courseID'].append(courseID)
+        if not coursesInfo:
+            return -1
+        return coursesInfo
 
-            if not courseInfo:
-                return -1
-            return courseInfo
-
-        else:               # Student
-            qry = "SELECT courseID,courseName, semester,year, firstName,lastName,email " \
-                  "FROM (Users JOIN Courses ON Users.ID = Courses.professorID) NATURAL JOIN TakenClasses " \
-                  "WHERE studentID = %(userID)s ORDER BY year ASC,semester DESC;"
-            self.cursor.execute(qry,{"userID":userID})
-
-            courseInfo = defaultdict(list)
-            for (courseID,courseName, semester,year, firstName,lastName,email) in self.cursor:
-                courseInfo['courseID'].append(courseID)
-                courseInfo['courseName'].append(courseName)
-                courseInfo['semester'].append(semester)
-                courseInfo['year'].append(year)
-                courseInfo['professorName'].append(firstName +" "+lastName)
-                courseInfo['professorEmail'].append(email)
-
-            if not courseInfo:
-                return -2
-            return courseInfo
-
-
-    def get_Materials(self,courseID):
-        qry ="SELECT material,timestamp FROM ClassMaterials WHERE coursesID = %(courseID)s ORDER BY timestamp ASC;"
+    def get_courseInfo(self, courseID):
+        qry = "SELECT professorID,courseName, semester,year, firstName,lastName,email " \
+              "FROM Users JOIN Courses ON Users.ID = Courses.professorID " \
+              "WHERE courseID = %(courseID)s ORDER BY year ASC,semester DESC;"
         self.cursor.execute(qry, {"courseID": courseID})
 
-        materialInfo = defaultdict(list)
-        for (material,timestamp) in self.cursor:
-            materialInfo['material'].append(material)
-            materialInfo['time'].append(timestamp.strftime("%m/%d/%Y, %H:%M:%S"))
+        courseInfo = {}
+        for (professorID, courseName, semester, year, firstName, lastName, email) in self.cursor:
+            courseInfo['courseName'] = courseName
+            courseInfo['semester'] = semester
+            courseInfo['year'] = year
+            courseInfo['professorName'] = firstName + " " + lastName
+            courseInfo['professorEmail'] = email
+
+        if not courseInfo:
+            return -1
+        return courseInfo
+
+    def get_Materials(self, courseID):
+        qry = "SELECT materialID, material,postTime " \
+              "FROM ClassMaterials WHERE courseID = %(courseID)s ORDER BY postTime ASC;"
+        self.cursor.execute(qry, {"courseID": courseID})
+
+        materialInfo = []
+        for (materialID, content, postTime) in self.cursor:
+            materialInfo.append({'materialID': materialID, 'material': content,
+                                 'postTime': postTime.strftime("%m/%d/%Y, %H:%M:%S")})
+
         if not materialInfo:
             return -1
         return materialInfo
 
-    def get_Assignments(self,courseID):
-        qry ="SELECT assignID, deadline,task,gradeTotal,timestamp FROM Assignment WHERE coursesID = %(courseID)s ORDER BY timestamp ASC;"
+    def get_Annocement(self, courseID):
+        qry = "SELECT announcementID, announcement,postTime " \
+              "FROM ClassAnnouncement WHERE courseID = %(courseID)s ORDER BY postTime ASC;"
         self.cursor.execute(qry, {"courseID": courseID})
 
-        assignmentInfo = defaultdict(list)
-        for (assignID,deadline,task,gradeTotal,timestamp) in self.cursor:
-            assignmentInfo['assignID'].append(assignID)
-            assignmentInfo['deadline'].append(deadline.strftime("%m/%d/%Y, %H:%M:%S"))
-            assignmentInfo['task'].append(task)
-            assignmentInfo['gradeTotal'].append(gradeTotal)
-            assignmentInfo['postTime'].append(timestamp.strftime("%m/%d/%Y, %H:%M:%S"))
+        announcementInfo = []
+        for (announcementID, content, postTime) in self.cursor:
+            announcementInfo.append({'announcementID': announcementID, 'material': content,
+                                     'postTime': postTime.strftime("%m/%d/%Y, %H:%M:%S")})
+        if not announcementInfo:
+            return -1
+        return announcementInfo
+
+    def get_Assignments(self, courseID):
+        qry = "SELECT assignID, deadline,task,gradeTotal,postTime " \
+              "FROM Assignment WHERE courseID = %(courseID)s ORDER BY postTime ASC;"
+        self.cursor.execute(qry, {"courseID": courseID})
+
+        assignmentInfo = []
+        for (assignID, deadline, task, gradeTotal, postTime) in self.cursor:
+            assignmentInfo.append({'assignID': assignID, 'task': task, 'gradeTotal': gradeTotal,
+                                   'deadline': deadline.strftime("%m/%d/%Y, %H:%M:%S"),
+                                   'postTime': postTime.strftime("%m/%d/%Y, %H:%M:%S")
+                                   })
+
         if not assignmentInfo:
             return -1
         return assignmentInfo
 
+    # ################################
+    # Below still need modify
+
     # get_grades
-    def get_grades(self,userID, courseID):
-        self.cursor.execute("SELECT userType FROM Users WHERE ID = %s;" %userID)
+    def get_grades(self, userID, courseID):
+        self.cursor.execute("SELECT userType FROM Users WHERE ID = %s;" % userID)
         for (userType) in self.cursor:
             uType = userType[0]
 
-        if uType == 1:       #Professor
+        if uType == 1:  # Professor
             qry = "SELECT TakenClasses.studentID, TakenClasses.grade, Users.firstName,Users.lastName,Courses.courseName " \
                   "FROM Courses NATURAL JOIN TakenClasses " \
                   "JOIN Users ON TakenClasses.studentID = Users.ID " \
                   "WHERE coursesID = %s AND professorID = %s ORDER BY Users.lastName ASC;"
-            self.cursor.execute(qry, (courseID,userID))
+            self.cursor.execute(qry, (courseID, userID))
 
             gradeInfo = defaultdict(list)
-            for (studentID,grade,firstName, lastName,courseName) in self.cursor:
+            for (studentID, grade, firstName, lastName, courseName) in self.cursor:
                 gradeInfo['studentID'].append(studentID)
                 gradeInfo['grade'].append(grade)
                 gradeInfo['studentFirstName'].append(firstName)
@@ -128,16 +141,15 @@ class getUser():
             if not gradeInfo:
                 return -1
 
-        else:                #Student
+        else:  # Student
             qry = "SELECT Courses.courseName, Courses.professorID, TakenClasses.grade, Users.firstName,Users.lastName " \
                   "FROM TakenClasses NATURAL JOIN Courses " \
                   "JOIN Users ON Courses.professorID = Users.ID " \
                   "WHERE coursesID = %s AND studentID = %s ORDER BY Users.lastName ASC;"
-            self.cursor.execute(qry, (courseID,userID))
-
+            self.cursor.execute(qry, (courseID, userID))
 
             gradeInfo = defaultdict(list)
-            for (courseName,professorID,grade,firstName, lastName) in self.cursor:
+            for (courseName, professorID, grade, firstName, lastName) in self.cursor:
                 gradeInfo['courseName'].append(courseName)
                 gradeInfo['professorID'].append(professorID)
                 gradeInfo['finalgrade'].append(grade)
@@ -147,14 +159,14 @@ class getUser():
                 return -2
         return gradeInfo
 
-    def get_submission(self,assignID):
+    def get_submission(self, assignID):
         qry = "SELECT studentID, file, timestamp, Users.firstName,Users.lastName  " \
               "FROM AssignmentSubmission JOIN Users ON AssignmentSubmission.studentID = Users.ID " \
               "WHERE AssignmentSubmission.assignID = %(assignID)s;"
-        self.cursor.execute(qry,{"assignID": assignID})
+        self.cursor.execute(qry, {"assignID": assignID})
 
         submissionInfo = defaultdict(list)
-        for (studentID, file, timestamp, firstName,lastName) in self.cursor:
+        for (studentID, file, timestamp, firstName, lastName) in self.cursor:
             submissionInfo['studentID'].append(studentID)
             submissionInfo['file'].append(file)
             submissionInfo['submitTime'].append(timestamp.strftime("%m/%d/%Y, %H:%M:%S"))

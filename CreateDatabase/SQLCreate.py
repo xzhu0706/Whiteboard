@@ -1,46 +1,41 @@
 import random
 import datetime
 import string
+import mysql.connector
 
 
-
-def random_users(num):
+def random_users():
     last = ("Aaren","Aarika","Oliver","Jacob","William","Sophia","Emma","Isabella")
     first = ("Allan", "Selina", "Hebe", "Ella", "Ada", "Frances", "Barbara","Abigail")
 
-    for _ in range(num):
-        firstName =random.choice(first)
-        lastName =random.choice(last)
-        username = firstName+''.join(random.choices(string.digits,k=3))
-        password = ''.join((random.choices(string.ascii_lowercase+string.digits,k=10)))
-        per = random.uniform(0,1)
-        if per < 0.8:
-            userType = 0
-            email = "@".join((username, "citymail.cuny.edu"))
-        else:
-            userType = 1
-            email = "@".join((username, "cuny.ccny.edu"))
 
-        yield (username, password,email,firstName,lastName,userType)
+    firstName =random.choice(first)
+    lastName =random.choice(last)
+    username = firstName+''.join(random.choices(string.digits,k=3))
+    password = ''.join((random.choices(string.ascii_lowercase+string.digits,k=10)))
+
+    if random.uniform(0,1) < 0.9:
+        userType = 0
+        email = "@".join((username, "citymail.cuny.edu"))
+    else:
+        userType = 1
+        email = "@".join((username, "cuny.ccny.edu"))
+
+    return username, password,email,firstName,lastName,userType
 
 def create_random_users(cursor,num):
-    for info in random_users(num):
-        username, password, email, firstName, lastName, userType, *_ = info
+    check = 0
+    for i in range(num):
+        username, password, email, firstName, lastName, userType = random_users()
         qry = "INSERT INTO Users (userName, password,email,firstName,lastName,userType) VALUES (%s,%s,%s,%s,%s,%s);"
-        cursor.execute(qry, (username, password,email,firstName,lastName,userType))
-
-
-
-
-
-def random_courses(num,IDs):
-    semesters = ("Spring","Fall")
-    for _ in range(num):
-        courseName = "CSc"+''.join((random.choices(string.digits,k=3)))
-        semester = random.choice(semesters)
-        year = random.randint(2015,2019)
-        professorID = random.choice(IDs)
-        yield (courseName,semester,year,professorID)
+        try:
+            cursor.execute(qry, (username, password,email,firstName,lastName,userType))
+        except mysql.connector.Error as err:
+            i -= 1
+            check += 1
+        if check >= 10:
+            print("Create %d Users" % i)
+            break
 
 def create_random_courses(cursor,num):
     qry = ("SELECT ID, userType FROM Users;")
@@ -50,68 +45,81 @@ def create_random_courses(cursor,num):
         if userType ==1:
             professorIDs.append(ID)
 
-    for info in random_courses(num,professorIDs):
-        courseName, semester, year, professorID, *_ = info
+    semesters = ("Spring", "Fall")
+    check = 0
+    for i in range(num):
+        courseName = "CSc" + ''.join((random.choices(string.digits, k=3)))
+        semester = random.choice(semesters)
+        year = random.randint(2015,2019)
+        professorID = random.choice(professorIDs)
         qry = "INSERT INTO Courses (courseName, semester, year, professorID) VALUES (%s,%s,%s,%s);"
-        cursor.execute(qry, (courseName, semester, year, professorID))
 
-
-#
-# def random_takenClasses(num,sIDs,cIDs):
-#
-#     for i in range(num):
-#         studentID = random.choice(sIDs)
-#         courseID = random.choice(cIDs)
-#         grade = random.randint(50,100)
-#         yield(studentID,courseID,grade)
+        try:
+            cursor.execute(qry, (courseName, semester, year, professorID))
+        except mysql.connector.Error as err:
+            i -= 1
+            check += 1
+        if check >= 10:
+            print("Create %d Users" % i)
+            break
 
 
 
 def create_random_takenClasses(cursor,num):
-    cursor.execute("SELECT ID, userType FROM Users;")
+    qry = ("SELECT ID, userType FROM Users;")
+    cursor.execute(qry)
     studentIDs = []
     for (ID, userType) in cursor:
         if userType ==0:
             studentIDs.append(ID)
 
-    cursor.execute("SELECT courseID FROM Courses;")
-    courseIDs = []
-    for courseID in cursor:
-        courseIDs.append(courseID[0])
-
-    for i in range(num):
-        sID = studentIDs[i%len(studentIDs)]
-        cID = courseIDs[i//len(studentIDs)]
-        grade = random.randint(50, 100)
-
-        qry = "INSERT INTO TakenClasses (studentID,courseID,grade) VALUES (%s,%s,%s);"
-        cursor.execute(qry, (sID,cID,grade))
-
-
-
-
-def random_assignment(num,cIDs,day):
-    for _ in range(num):
-        courseID = random.choice(cIDs)
-        deadline = datetime.datetime.now() + datetime.timedelta(days = day)
-        task = 'task'
-        gradeTotal = 100
-        yield (courseID,deadline,task,gradeTotal)
-
-def create_random_assignment(cursor,num,days):
-    qry = ("SELECT courseID FROM TakenClasses;")
+    qry = ("SELECT courseID FROM Courses;")
     cursor.execute(qry)
     courseIDs = []
     for courseID in cursor:
         courseIDs.append(courseID[0])
 
-    for info in random_assignment(num,courseIDs,days):
-        courseID, deadline, task, gradeTotal, *_ = info
+    check = 0
+    for i in range(num):
+        studentID = random.choice(studentIDs)
+        courseID = random.choice(courseIDs)
+        grade = random.randint(50, 100)
+        qry = "INSERT INTO TakenClasses (studentID,courseID,grade) VALUES (%s,%s,%s);"
 
+        try:
+            cursor.execute(qry, (studentID, courseID, grade))
+        except mysql.connector.Error as err:
+            i -= 1
+            check += 1
+        if check >= 10:
+            print("Create %d Users" % i)
+            break
+
+
+
+def create_random_assignment(cursor,num,days):
+    qry = ("SELECT courseID FROM Courses;")
+    cursor.execute(qry)
+    courseIDs = []
+    for courseID in cursor:
+        courseIDs.append(courseID[0])
+
+    check = 0
+    task = 'task'
+    gradeTotal = 100
+    for i in range(num):
+        courseID = random.choice(courseIDs)
+        deadline = datetime.datetime.combine(datetime.date.today()+datetime.timedelta(days=days), datetime.time.max)
         qry = "INSERT INTO Assignment (courseID,deadline,task,gradeTotal) VALUES (%s,%s,%s,%s);"
-        cursor.execute(qry, (courseID,deadline,task,gradeTotal))
 
-
+        try:
+            cursor.execute(qry, (courseID, deadline, task, gradeTotal))
+        except mysql.connector.Error as err:
+            i -= 1
+            check += 1
+        if check >= 10:
+            print("Create %d Users" % i)
+            break
 
 def create_random_assignmentSubmission(cursor,num):
     qry =("SELECT studentID,assignID FROM TakenClasses NATURAL JOIN Assignment;")
@@ -123,63 +131,110 @@ def create_random_assignmentSubmission(cursor,num):
         stuID.append(studentID)
         assID.append(assignID)
 
+    check = 0
+    file = "File"
+
     for i in range(num):
-        if i > len(stuID):
-            break
+
         studentID = stuID[i]
         assignID = assID[i]
-        isGraded = random.randint(0,1)
-        file = "File"
-        # print(f"{studentID}: {assignID},  {isGraded}")
-
+        isGraded = random.randint(0, 1)
         qry = "INSERT INTO AssignmentSubmission(studentID,assignID,isGraded,file) VALUES (%s,%s,%s,%s);"
-        cursor.execute(qry, (studentID,assignID,isGraded,file))
+
+        try:
+            cursor.execute(qry, (studentID, assignID, isGraded, file))
+        except mysql.connector.Error as err:
+            i -= 1
+            check += 1
+
+        if check >= 10:
+            print("Create %d Users" % i)
+            break
+
+def create_random_exam(cursor, num):
+    qry = ("SELECT courseID FROM Courses;")
+    cursor.execute(qry)
+    courseIDs = []
+    for courseID in cursor:
+        courseIDs.append(courseID[0])
+
+    gradeTotal = 100
+    des = "Exams"
+    for i in range(num):
+        courseID = random.choice(courseIDs)
+        qry = "INSERT INTO Exam(courseID,gradeTotal,description) VALUES (%s,%s,%s);"
+        cursor.execute(qry, (courseID, gradeTotal, des))
 
 
 def create_random_gradeBook(cursor, num):
-    qry = ("SELECT studentID,courseID,submissionID From AssignmentSubmission NATURAL JOIN TakenClasses;")
-    cursor.execute(qry)
+    cursor.execute("SELECT studentID,courseID,submissionID From "
+                    "AssignmentSubmission NATURAL JOIN TakenClasses WHERE isGraded = 1;")
 
-    tuples = []
+    subTuple = []
     for (studentID,courseID,submissionID) in cursor:
-        tuples.append((studentID,courseID,submissionID))
+        subTuple.append((studentID,courseID,submissionID))
 
-    for i in range(num):
-        if i >= len(tuples):
-            break
-        studentID, courseID, submissionID = tuples[i]
-        description =" description"
-        grade = random.randint(50,100)
+    cursor.execute("SELECT studentID,courseID,examID From "
+                    "Exam NATURAL JOIN TakenClasses;")
 
-        qry = "INSERT INTO GradeBook(studentID,courseID, submissionID,description,grade) VALUES (%s,%s,%s,%s,%s);"
-        cursor.execute(qry, (studentID,courseID, submissionID,description,grade))
+    exTuple = []
+    for (studentID,courseID,examID) in cursor:
+        exTuple.append((studentID,courseID,examID))
 
+
+    qry = "INSERT INTO GradeBook(studentID, submissionID,grade) VALUES (%s,%s,%s);"
+
+    if num < len(subTuple):
+        for i in range(num):
+            studentID, courseID, submissionID = subTuple[i]
+            grade = random.randint(50, 100)
+            cursor.execute(qry, (studentID, submissionID,grade))
+    else:
+        for i in range(len(subTuple)):
+            studentID, courseID, submissionID = subTuple[i]
+            grade = random.randint(50, 100)
+            cursor.execute(qry, (studentID, submissionID, grade))
+        qry = "INSERT INTO GradeBook(studentID, examID,grade) VALUES (%s,%s,%s);"
+
+        if num - len(subTuple) < len(exTuple):
+
+            for i in range(num - len(subTuple)):
+                studentID, courseID, examID = exTuple[i]
+                grade = random.randint(50, 100)
+                cursor.execute(qry, (studentID, examID, grade))
+        else:
+            for i in range(len(exTuple)):
+                studentID, courseID, examID = exTuple[i]
+                grade = random.randint(50, 100)
+                cursor.execute(qry, (studentID, examID, grade))
+
+
+        print("Insert %s tuple into Gradebook" % str(len(subTuple)+len(exTuple)))
 
 
 
 def create_random_classAnnouncement(cursor,num):
-    qry = ("SELECT courseID FROM TakenClasses;")
+    qry = ("SELECT courseID FROM Courses;")
     cursor.execute(qry)
     courseIDs = []
     for courseID in cursor:
         courseIDs.append(courseID[0])
 
+    announcement = "announcement"
+    qry = "INSERT INTO ClassAnnouncement (courseID,announcement) VALUES (%s,%s);"
     for i in range(num):
-        announcement = "announcement"
-
-        qry = "INSERT INTO ClassAnnouncement (courseID,announcement) VALUES (%s,%s);"
         cursor.execute(qry, (courseIDs[random.choice(range(len(courseIDs)))],announcement))
 
 
 def create_random_classMaterials(cursor,num):
-    qry = ("SELECT courseID FROM TakenClasses;")
+    qry = ("SELECT courseID FROM Courses;")
     cursor.execute(qry)
     courseIDs = []
     for courseID in cursor:
         courseIDs.append(courseID[0])
 
-    for i in range(num):
-        material = "material"
+    material = "material"
+    qry = "INSERT INTO ClassMaterials (courseID,material) VALUES (%s,%s);"
 
-        qry = "INSERT INTO ClassMaterials (courseID,material) VALUES (%s,%s);"
+    for i in range(num):
         cursor.execute(qry, (courseIDs[random.choice(range(len(courseIDs)))],material))
