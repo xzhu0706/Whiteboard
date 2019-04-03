@@ -105,11 +105,11 @@ def announcementInfo(courseID):
 		return jsonify(announcementList), 200
 
 
-# @app.route("/api/createAnnocement", methods=['POST'])
+# @app.route("/api/createAnnouncement", methods=['POST'])
 # given: courseId, material
 # return: boolean of success or not of updating DB
-@app.route("/api/createAnnocement", methods=['POST'])
-def createAnnocement():
+@app.route("/api/createAnnouncement", methods=['POST'])
+def createAnnouncement():
 	json_load = request.get_json()
 	courseID = json_load['courseID']
 	announcement = json_load['announcement']

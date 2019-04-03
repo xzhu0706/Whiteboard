@@ -14,7 +14,14 @@ class Card extends Component {
 
   render() {
     return (
-      <div className="card">
+      <div 
+        className="card" 
+        onClick={(e) => this.props.onClick(e, this.props.id)}
+        style = {{
+          backgroundColor: this.props.bgColor, 
+          borderColor: this.props.borderColor,
+        }}
+      >
         <div className="header thumbnail">
           {this.props.header}
         </div>

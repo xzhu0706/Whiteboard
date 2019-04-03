@@ -25,9 +25,10 @@ class CoursePage extends Component {
 	async componentDidMount() {
 		let userID = cookie.load('userID');
 		let userType = cookie.load('userType');
-		this.setState({ userID, userType });
-
 		const params = this.props.match.params; // get params from url
+		let courseID = params.courseID;
+		this.setState({ userID, userType, courseID });
+
     console.log(params);
 
 		await fetch('http://localhost:5000/api/courseInfo/' + params.courseID)
@@ -58,7 +59,13 @@ class CoursePage extends Component {
 						status: res.status
 					})).then(res => {
 						console.log(res);
-						const announcements = <Announcements announcements={res.data} />
+						const announcements = (
+							<Announcements 
+								isProf={this.state.userType} 
+								announcements={res.data}
+								courseID={this.state.courseID} 
+							/>
+						);
 						this.setState({ announcements });
 					});
 				} else {
