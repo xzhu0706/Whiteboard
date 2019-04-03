@@ -38,10 +38,10 @@
 
 .side-bar {
   max-width: 200px;
-  max-height: 150px;
 }
 
 .side-bar-button {
   margin: 5px;
   display: block;
+  width: 120px;
 }

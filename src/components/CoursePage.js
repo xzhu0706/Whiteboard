@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import cookie from 'react-cookies';
 import Announcements from './Annoucements.js';
 import SideBar from './SideBar.js';
+import CoursePageHeader from './CoursePageHeader.js';
 
 class CoursePage extends Component {
 	constructor(props) {
@@ -10,13 +11,21 @@ class CoursePage extends Component {
 		this.state = {
 			userID: 0,
 			userType: 3,
-			professorID: 0,
-			courseName: '',
-			semester: '',
-			year: '',
-			professorEmail: '',
-			professorName: '',
-			announcements: []
+			// professorID: 0,
+			// courseName: '',
+			// semester: '',
+			// year: '',
+			// professorEmail: '',
+			// professorName: '',
+			announcements: [],
+			courseInfo: {
+				professorID: 0,
+				courseName: '',
+				semester: '',
+				year: '',
+				professorEmail: '',
+				professorName: '',
+			}
 			// maybe more stuff...
 		}
 
@@ -40,6 +49,9 @@ class CoursePage extends Component {
 						status: res.status
 					})).then(res => {
 						console.log(res);
+						this.setState({
+							courseInfo: res.data
+						})
 						let key;
 						for (key in res.data) {
 							this.setState({ [key]: res.data[key] });
@@ -61,7 +73,7 @@ class CoursePage extends Component {
 						console.log(res);
 						const announcements = (
 							<Announcements 
-								isProf={this.state.userType} 
+								isProf={this.state.userType == 1} 
 								announcements={res.data}
 								courseID={this.state.courseID} 
 							/>
@@ -75,7 +87,7 @@ class CoursePage extends Component {
 
 
 		// if (userType == 1) {   // userType = 1 = professor
-		// 	if (userID != this.state.professorID) {
+		// 	if (userID != this.state.courseInfo.professorID) {
 		// 		window.location = '/home/' + this.state.userID;
 		// 	}
 		// 	// TODO: for professor
@@ -90,25 +102,19 @@ class CoursePage extends Component {
 		return (
 			<div className="container-fluid">
 
-				<h1 className="course-page-header"> 
-					{this.state.courseName} {this.state.semester} {this.state.year} 
-				</h1>
-
-				<div className="professor-contact-info">
-					<h3>{this.state.professorName}</h3>
-					<h3>{this.state.professorEmail}</h3>
-				</div>
+				<CoursePageHeader courseInfo={this.state.courseInfo} />
 
 				<div className="row">
+
 					<div className="col-sm-4 d-flex justify-content-end">
 						<SideBar />
 					</div>
+
 					<div className="col-sm-8">
 						{this.state.announcements}
 					</div>
+
 				</div>
-
-
 
 			</div>
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Card from './Card.js';
 import { Button } from 'reactstrap';
-import CreateAnnouncement from './CreateAnnouncement.js';
+import SingleInputFieldModal from './modals/SingleFieldModal.js';
 
 class Announcements extends Component {
   constructor(props) {
@@ -10,8 +10,10 @@ class Announcements extends Component {
 			announcements: 'None',
 			announcementsList: [],
 			selectedAnnouncement: '',
+			createAnnouncementModal: false,
 		};
 		
+		this.toggleCreateAnnouncementModal = this.toggleCreateAnnouncementModal.bind(this);
 		this.handleOnClickAnnouncement = this.handleOnClickAnnouncement.bind(this);
 		this.handleDeleteAnnouncement = this.handleDeleteAnnouncement.bind(this);
 		this.handleCreateAnnouncement = this.handleCreateAnnouncement.bind(this);
@@ -35,7 +37,7 @@ class Announcements extends Component {
 			})
 			this.setState({ announcements });
 		}
-  }
+	}
 	
 	handleOnClickAnnouncement(e, ancmID) {
 		console.log(ancmID);
@@ -65,8 +67,42 @@ class Announcements extends Component {
 		//TODO: need delete announcement API call from backend
 	}
 
-	handleCreateAnnouncement(e) {
-		//TODO: 
+	handleCreateAnnouncement(event, announcement) {
+//		event.preventDefault();
+		const data = {
+			courseID: this.props.courseID,
+			announcement: announcement
+		}
+		console.log(data);
+
+		fetch('http://localhost:5000/api/createAnnouncement', {
+			method: 'POST',
+			headers: {'Content-Type':'application/json'},
+			body: JSON.stringify(data)
+		}).then((res) => {
+
+			console.log(res)
+			if(res.ok) {
+				res.json().then(data => ({
+					data: data,
+					status: res.status
+				})).then(res => {
+					console.log(res);
+				});
+			}
+			else{
+				// window.location.replace("/error");
+				console.log('error while posting announcement')
+			}
+
+		});
+
+	}
+
+	toggleCreateAnnouncementModal() {
+		this.setState({
+			createAnnouncementModal: !this.state.createAnnouncementModal
+		})
 	}
 
 
@@ -85,18 +121,22 @@ class Announcements extends Component {
 
 					<div className="card-footer">
 						{/* for create, delete buttons */}
-						<CreateAnnouncement
-							label="Create"
-							courseID={this.props.courseID}
+						<SingleInputFieldModal
+							isOpen={this.state.createAnnouncementModal}
+							toggle={this.toggleCreateAnnouncementModal}
+							handleSubmit={this.handleCreateAnnouncement}
+							header="New Announcement"
 						/>
-						{/* <Button 
-							className="side-bar-button"
-							onClick={this.handleCreateAnnouncement}
-						>
-							Create
-						</Button> */}
 						<Button 
 							className="side-bar-button"
+							color="info"
+							onClick={this.toggleCreateAnnouncementModal}
+						>
+							Create
+						</Button>
+						<Button 
+							className="side-bar-button"
+							color="warning"
 							onClick={this.handleDeleteAnnouncement}
 						>
 							Delete

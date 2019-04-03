@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {Col, Form, FormGroup, Label, Input, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
-class CreateAnnouncementModal extends Component {
+class SingleInputFieldModal extends Component {
   constructor(props) {
     super(props);
 
@@ -14,16 +14,16 @@ class CreateAnnouncementModal extends Component {
 				<Modal isOpen={this.props.isOpen} toggle={this.props.toggle} className={this.props.className}>
             <ModalHeader toggle={this.props.toggle}>{this.props.header}</ModalHeader>
             <ModalBody>
-                <Form onSubmit={this.props.handleSubmit} >
+                <Form onSubmit={(e) => {this.props.handleSubmit(e, e.target.input.value)}} >
                     <FormGroup row>
                       {/* <Label for="exampleEmail" sm={2}>Email</Label> */}
                       <Col lg={10}>
-                        <Input type="text" name="Announcement" id="announcement"  />
+                        <Input type="text" name="input"  />
                       </Col>
                     </FormGroup>
                     <FormGroup>
                       <Col sm={10}>
-                        <Button color="success">Create</Button>
+                        <Button color="success">Submit</Button>
                       </Col>
                     </FormGroup>
                 </Form>
@@ -34,4 +34,4 @@ class CreateAnnouncementModal extends Component {
 	}
 }
 
-export default CreateAnnouncementModal;
+export default SingleInputFieldModal;
