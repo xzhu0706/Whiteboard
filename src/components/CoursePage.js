@@ -11,12 +11,6 @@ class CoursePage extends Component {
 		this.state = {
 			userID: 0,
 			userType: 3,
-			// professorID: 0,
-			// courseName: '',
-			// semester: '',
-			// year: '',
-			// professorEmail: '',
-			// professorName: '',
 			announcements: [],
 			courseInfo: {
 				professorID: 0,

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Button } from 'reactstrap';
 
 class Card extends Component {
   constructor(props) {
@@ -13,24 +14,46 @@ class Card extends Component {
   }
 
   render() {
-    return (
-      <div 
-        className="card" 
-        onClick={(e) => this.props.onClick(e, this.props.id)}
-        style = {{
-          backgroundColor: this.props.bgColor, 
-          borderColor: this.props.borderColor,
-        }}
-      >
-        <div className="header thumbnail">
-          {this.props.header}
+    if (!this.props.isProf && this.props.isAssignment && this.props.notSubmitted) {
+      return (
+        <div 
+          className="card" 
+          onClick={(e) => this.props.onClick(e, this.props.id)}
+          style = {{
+            backgroundColor: this.props.bgColor, 
+            borderColor: this.props.borderColor,
+          }}
+        >
+          <div className="header thumbnail d-flex">
+            {/* {this.props.header} */}
+            <Button className="jutify-content-sm-end" onClick={this.props.handleSubmitAssign}>Submit</Button>
+          </div>
+          <div className="card-body">
+            <h5 className="card-text">{this.props.body}</h5>
+            <h6 className="card-text text-muted text-right">{this.props.time}</h6>
+          </div>
         </div>
-        <div className="card-body">
-          <h5 className="card-text">{this.props.body}</h5>
-          <h6 className="card-text text-muted text-right">{this.props.time}</h6>
+      );
+    } else {
+      return (
+        <div 
+          className="card" 
+          onClick={(e) => this.props.onClick(e, this.props.id)}
+          style = {{
+            backgroundColor: this.props.bgColor, 
+            borderColor: this.props.borderColor,
+          }}
+        >
+          <div className="header thumbnail">
+            {this.props.header}
+          </div>
+          <div className="card-body">
+            <h5 className="card-text">{this.props.body}</h5>
+            <h6 className="card-text text-muted text-right">{this.props.time}</h6>
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
   }
 };
 

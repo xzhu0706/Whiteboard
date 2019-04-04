@@ -50,7 +50,7 @@ class Announcements extends Component {
 				return (
 					<Card 
 						id={ancm.announcementID}
-						bgColor={ancmID === ancm.announcementID ? 'yellow' : '' }
+						bgColor={ancmID === ancm.announcementID ? '#ea8383' : '' }
 						borderColor={ancmID === ancm.announcementID ? 'red' : ''}
 						body={ancm.announcement}
 						time={ancm.postTime}

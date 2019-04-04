@@ -34,7 +34,7 @@ class SideBar extends Component {
 				<div></div>
 				<Button className="side-bar-button" color="secondary" onClick={(e) => {window.location = '/course/' + this.state.courseID}}>Announcements</Button>
 				<Button className="side-bar-button" color="success" onClick={(e) => {window.location = '/materials/' + this.state.courseID}}>Materials</Button>
-				<Button className="side-bar-button" color="primary">Assignments</Button>
+				<Button className="side-bar-button" color="primary" onClick={(e) => {window.location = '/assignments/' + this.state.courseID}}>Assignments</Button>
 				<Button className="side-bar-button" color="danger">GradeBook</Button>
 				<Button className="side-bar-button" onClick={this.handleLogOut}>Log Out</Button>
 			</div>

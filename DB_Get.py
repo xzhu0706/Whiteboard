@@ -93,7 +93,7 @@ def get_Assignments(cursor, courseID):
             pastDue = True
         else:
             pastDue = False
-        assignmentInfo.append({'assignID': assignID, 'task': task, 'gradeTotal': gradeTotal,
+        assignmentInfo.append({'assignmentID': assignID, 'task': task, 'gradeTotal': gradeTotal,
                                'deadline': deadline.strftime("%m/%d/%Y, %H:%M:%S"),
                                'postTime': postTime.strftime("%m/%d/%Y, %H:%M:%S"),
                                'pastDue': pastDue
