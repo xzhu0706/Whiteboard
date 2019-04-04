@@ -64,7 +64,25 @@ class Announcements extends Component {
 
 	handleDeleteAnnouncement(e) {
 		console.log('delete ancm', this.state.selectedAnnouncement);
-		//TODO: need delete announcement API call from backend
+		if (this.state.selectedAnnouncement) {
+			fetch('http://localhost:5000/api/deleteAnnouncement/' + this.state.selectedAnnouncement, {
+				method: 'DELETE'
+			})
+			.then((res) => {
+				console.log(res);
+				if (res.ok) {
+					res.json().then(data => ({
+						data: data,
+						status: res.status
+					})).then(res => {
+						console.log(res);
+					});
+				} else {
+						console.log('error while deleting announcement');
+					}
+			});
+			window.location.reload();
+		}	
 	}
 
 	handleCreateAnnouncement(event, announcement) {
@@ -128,14 +146,14 @@ class Announcements extends Component {
 							header="New Announcement"
 						/>
 						<Button 
-							className="side-bar-button"
+							className="other-button"
 							color="info"
 							onClick={this.toggleCreateAnnouncementModal}
 						>
 							Create
 						</Button>
 						<Button 
-							className="side-bar-button"
+							className="other-button"
 							color="warning"
 							onClick={this.handleDeleteAnnouncement}
 						>

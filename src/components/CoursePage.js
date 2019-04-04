@@ -49,9 +49,9 @@ class CoursePage extends Component {
 						status: res.status
 					})).then(res => {
 						console.log(res);
-						this.setState({
-							courseInfo: res.data
-						})
+						const courseInfo = res.data;
+						this.setState({ courseInfo });
+						cookie.save('courseInfo', courseInfo, { path: '/' });
 						let key;
 						for (key in res.data) {
 							this.setState({ [key]: res.data[key] });
