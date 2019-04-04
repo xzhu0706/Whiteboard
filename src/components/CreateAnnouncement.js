@@ -22,7 +22,7 @@ class CreateAnnouncement extends Component {
 
 
   handleSubmit(event) {
-      //event.preventDefault();
+      // event.preventDefault();
 
       // const loginData = {
       //     EmailAddress: event.target.EmailAddress.value,

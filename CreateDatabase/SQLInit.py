@@ -41,7 +41,7 @@ def init(cursor,database):
                        "file VARCHAR(256), "
                        "uploadTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                        "FOREIGN KEY (studentID) REFERENCES Users(ID),"
-                       "FOREIGN KEY (assignID) REFERENCES Assignment(assignID));")
+                       "FOREIGN KEY (assignID) REFERENCES Assignment(assignID) ON DELETE CASCADE);")
     cursor.execute("CREATE TABLE Exam("
                        "examID INTEGER PRIMARY KEY AUTO_INCREMENT,"
                        "courseID INTEGER,"
@@ -57,7 +57,7 @@ def init(cursor,database):
                        "submissionID INTEGER,"
                        "grade FLOAT,"
                        "gradeTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-                       "FOREIGN KEY (submissionID) REFERENCES AssignmentSubmission(submissionID),"
+                       "FOREIGN KEY (submissionID) REFERENCES AssignmentSubmission(submissionID) ON DELETE CASCADE,"
                        "FOREIGN KEY (studentID) REFERENCES Users(ID),"
                        "FOREIGN KEY (examID) REFERENCES Exam(examID));")
 

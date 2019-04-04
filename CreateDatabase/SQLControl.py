@@ -100,7 +100,7 @@ def main(argv,type,num, database):
 
 table = ["Users","Courses","TakenClasses","Assignment","AssignmentSubmission","Exam","GradeBook","ClassAnnouncement","ClassMaterials"]
 action = ["init", "create","query","deleteDB"]
-nums = [70,4,80,10,30,10,30,6,6]
+nums = [50,4,50,10,30,10,30,6,6]
 num = 5
 
 main("",type,num,database)
