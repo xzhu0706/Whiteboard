@@ -26,3 +26,4 @@ yarn-error.log*
 /__pycache__
 .vscode
 /.idea
+/CreateDatabase/__pycache__
