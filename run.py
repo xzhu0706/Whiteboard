@@ -120,13 +120,15 @@ def createAnnouncement():
 
 
 # @app.route("/api/assignments/<courseID>", methods=['GET])
-# given: courseId
-# return: dict of list: (assignID, task, gradeTotal,deadline, postTime,pastDue) of that courseId
+# given: courseId, userID
+# return:
+# 		dict of list: (assignID, task, gradeTotal,deadline, postTime,pastDue) for professor
+# 		extra boolean data: isSumbit     for student
 # 		(sort by postTime)
 # 		found=False if No Assignment Found
-@app.route("/api/assignments/<courseID>", methods=['GET'])
-def assignmentInfo(courseID):
-	assignmentList = User.get_Assignments(courseID)
+@app.route("/api/assignments/<courseID>/<ID>", methods=['GET'])
+def assignmentInfo(courseID,ID):
+	assignmentList = User.get_Assignments(courseID,ID)
 
 	if assignmentList == -1:
 		return jsonify(found=False), 404

@@ -33,8 +33,8 @@ class db_User():
     def get_Announcement(self, courseID):
         return DB_Get.get_Announcement(self.cursor, courseID)
 
-    def get_Assignments(self, courseID):
-        return DB_Get.get_Assignments(self.cursor, courseID)
+    def get_Assignments(self, courseID, ID):
+        return DB_Get.get_Assignments(self.cursor, courseID,ID)
 
     def get_Submission(self,assignID):
         return DB_Get.get_submission(self.cursor,assignID)

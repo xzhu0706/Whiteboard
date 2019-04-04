@@ -23,7 +23,7 @@ def makeAnnouncement(cursor,courseID,announcement):
 
 def createAssignment(cursor,courseID,deadline,task,gradeTotal):
     qry = "INSERT INTO Assignment (courseID,deadline,task,gradeTotal) " \
-          "VALUES (%s,%s,%s,%s);"
+          "VALUE (%s,%s,%s,%s);"
     try:
         cursor.execute(qry, (courseID,deadline,task,gradeTotal))
         return True

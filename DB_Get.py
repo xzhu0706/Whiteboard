@@ -56,7 +56,7 @@ def get_courseInfo(cursor, courseID):
 
 def get_Materials(cursor, courseID):
     qry = "SELECT materialID, material,postTime " \
-          "FROM ClassMaterials WHERE courseID = %(courseID)s ORDER BY postTime ASC;"
+          "FROM ClassMaterials WHERE courseID = %(courseID)s ORDER BY postTime DESC;"
     cursor.execute(qry, {"courseID": courseID})
 
     materialInfo = []
@@ -70,7 +70,7 @@ def get_Materials(cursor, courseID):
 
 def get_Announcement(cursor, courseID):
     qry = "SELECT announcementID, announcement,postTime " \
-          "FROM ClassAnnouncement WHERE courseID = %(courseID)s ORDER BY postTime ASC;"
+          "FROM ClassAnnouncement WHERE courseID = %(courseID)s ORDER BY postTime DESC;"
     cursor.execute(qry, {"courseID": courseID})
 
     announcementInfo = []
@@ -81,9 +81,14 @@ def get_Announcement(cursor, courseID):
         return -1
     return announcementInfo
 
-def get_Assignments(cursor, courseID):
+def get_Assignments(cursor, courseID, ID):
+    cursor.execute("SELECT userType FROM Users WHERE ID = %s;" % ID)
+    for (userType) in cursor:
+        uType = userType[0]
+
+
     qry = "SELECT assignID, deadline,task,gradeTotal,postTime " \
-          "FROM Assignment WHERE courseID = %(courseID)s ORDER BY postTime ASC;"
+          "FROM Assignment WHERE courseID = %(courseID)s ORDER BY postTime DESC;"
     cursor.execute(qry, {"courseID": courseID})
 
     assignmentInfo = []
@@ -97,6 +102,14 @@ def get_Assignments(cursor, courseID):
                                'postTime': postTime.strftime("%m/%d/%Y, %H:%M:%S"),
                                'pastDue': pastDue
                                })
+    if uType == 0:
+        for dict in assignmentInfo:
+            assignID = dict['assignID']
+            cursor.execute("SELECT submissionID FROM AssignmentSubmission "
+                           "WHERE studentID = %s AND assignID = %s;" % (ID,assignID))
+            dict['isSubmit'] = False
+            for (submissionID) in cursor:
+                dict['isSubmit'] = True
 
     if not assignmentInfo:
         return -1

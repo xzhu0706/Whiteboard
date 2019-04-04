@@ -132,13 +132,13 @@ def create_random_assignmentSubmission(cursor,num):
         assID.append(assignID)
 
     check = 0
+    isGraded = 0
     file = "File"
 
     for i in range(num):
-
         studentID = stuID[i]
         assignID = assID[i]
-        isGraded = random.randint(0, 1)
+
         qry = "INSERT INTO AssignmentSubmission(studentID,assignID,isGraded,file) VALUES (%s,%s,%s,%s);"
 
         try:
@@ -167,8 +167,11 @@ def create_random_exam(cursor, num):
 
 
 def create_random_gradeBook(cursor, num):
-    cursor.execute("SELECT studentID,courseID,submissionID From "
-                    "AssignmentSubmission NATURAL JOIN TakenClasses WHERE isGraded = 1;")
+    cursor.execute("SELECT AssignmentSubmission.studentID,TakenClasses.courseID,submissionID "
+                   "FROM TakenClasses NATURAL JOIN Assignment JOIN AssignmentSubmission "
+                   "ON TakenClasses.studentID = AssignmentSubmission.studentID "
+                   "AND Assignment.assignID=AssignmentSubmission.assignID;")
+
 
     subTuple = []
     for (studentID,courseID,submissionID) in cursor:
@@ -185,17 +188,21 @@ def create_random_gradeBook(cursor, num):
     qry = "INSERT INTO GradeBook(studentID, submissionID,grade) VALUES (%s,%s,%s);"
 
     if num < len(subTuple):
+        import numpy as np
+        index = np.random.permutation(len(subTuple))
         for i in range(num):
-            studentID, courseID, submissionID = subTuple[i]
+            studentID, courseID, submissionID = subTuple[index[i]]
             grade = random.randint(50, 100)
             cursor.execute(qry, (studentID, submissionID,grade))
+            cursor.execute("UPDATE AssignmentSubmission SET isGraded = 1 WHERE submissionID = %s;"%submissionID)
     else:
         for i in range(len(subTuple)):
             studentID, courseID, submissionID = subTuple[i]
             grade = random.randint(50, 100)
             cursor.execute(qry, (studentID, submissionID, grade))
-        qry = "INSERT INTO GradeBook(studentID, examID,grade) VALUES (%s,%s,%s);"
+            cursor.execute("UPDATE AssignmentSubmission SET isGraded = 1 WHERE submissionID = %s;" % submissionID)
 
+        qry = "INSERT INTO GradeBook(studentID, examID,grade) VALUES (%s,%s,%s);"
         if num - len(subTuple) < len(exTuple):
 
             for i in range(num - len(subTuple)):
