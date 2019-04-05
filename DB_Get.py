@@ -120,7 +120,7 @@ def get_Assignments(cursor, courseID, ID):
 # add isGrade(boolean) and grade (number of none)
 def get_submission(cursor, assignID):
     cursor.execute("SELECT AssignmentSubmission.submissionID, TakenClasses.studentID, "
-                   "file, gradeTotal, uploadTime, Users.firstName,Users.lastName,GradeBook.grade "
+                   "file, gradeTotal, uploadTime, Users.firstName,Users.lastName,GradeBook.grade,deadline "
                    "FROM TakenClasses LEFT JOIN Assignment "
                    "ON TakenClasses.courseID = Assignment.courseID "
                    "JOIN Users ON TakenClasses.studentID = Users.ID "
@@ -130,27 +130,38 @@ def get_submission(cursor, assignID):
                    "LEFT JOIN GradeBook "
                    "ON AssignmentSubmission.submissionID = GradeBook.submissionID "
                    "AND AssignmentSubmission.studentID=GradeBook.StudentID "
-                   "WHERE Assignment.assignID = %s;"% assignID)
+                   "WHERE Assignment.assignID = %s ORDER BY Users.lastName ASC;"% assignID)
 
     submissionInfo = []
-    for (submissionID, studentID, file, gradeTotal, uploadTime, firstName, lastName,grade) in cursor:
+    for (submissionID, studentID, file, gradeTotal, uploadTime, firstName, lastName, grade,deadline) in cursor:
+
+        pastDue = False
+        if deadline < datetime.datetime.now():
+            pastDue = True
 
         dict = {'submissionID': None, 'studentID': studentID,
                                    'content': None, 'gradeTotal': gradeTotal,
                                    'submitTime': None, 'grade':None,
                                    'studentName': firstName + ' ' + lastName,
                                    'isSubmit': False, 'isGraded': False,
+                                   'pastDue': pastDue,'isLate' : pastDue
                                    }
         if submissionID is None:
             submissionInfo.append(dict)
         else:
+            isLate = False
+            if deadline > uploadTime:
+                isLate = True
+
             dict['submissionID'] = submissionID
             dict['content'] = file
             dict['submitTime'] = uploadTime
             dict['isSubmit'] = True
             dict['grade'] = grade
-
             dict['isGraded'] = True
+            dict['pastDue']=pastDue
+            dict['isLate'] = isLate
+
             if grade is None:
                 dict['isGraded'] = False
 
@@ -165,15 +176,80 @@ def get_submission(cursor, assignID):
 # ################################
 # Below still need modify
 
+
 # # get_grades
-def get_grades(cursor, userID, courseID):
+def get_grades(cursor, courseID,userID):
     cursor.execute("SELECT userType FROM Users WHERE ID = %s;" % userID)
     for (userType) in cursor:
         uType = userType[0]
 
-    if uType == 0: #Student
-        cursor.execute("")
-#
+    if uType == 0:  # Student
+        cursor.execute("SELECT grade,description,title,Assignment.assignID "
+                       "FROM GradeBook LEFT JOIN AssignmentSubmission "
+                       "ON GradeBook.submissionID = AssignmentSubmission.submissionID "
+                       "AND GradeBook.StudentID = %s "
+                       "AND AssignmentSubmission.studentID = GradeBook.StudentID "
+                       "LEFT JOIN Exam ON GradeBook.examID = Exam.examID "
+                       "LEFT JOIN Assignment ON AssignmentSubmission.assignID = Assignment.assignID "
+                       "WHERE Assignment.courseID = %s OR Exam.courseID = %s;"%(userID,courseID,courseID))
+
+        gradeDict = {"assignment":[], "exam":[], "final":0}
+        for (grade, description,title, assignID) in cursor:
+            if title is None:       # Not Assignment
+                gradeDict["exam"].append({"examTitle": description, "examGrade":grade})
+            else:                   # Not Exam
+                gradeDict["assignment"].append({"assignmentTitle":title, "assignmentGrade":grade})
+
+        cursor.execute("SELECT grade FROM TakenClasses WHERE courseID = %s AND studentID = %s;"%(courseID,userID))
+        for grade in cursor:
+            gradeDict["final"] = grade
+
+    else:
+        cursor.execute("SELECT studentID,grade FROM TakenClasses WHERE courseID = %s ;"% courseID)
+        finalGrade = {}
+        for studentID, grade in cursor:
+            finalGrade[studentID] = grade
+
+        cursor.execute("SELECT GradeBook.StudentID, grade,description,title, firstName,lastName "
+                       "FROM GradeBook LEFT JOIN AssignmentSubmission "
+                       "ON GradeBook.submissionID = AssignmentSubmission.submissionID "
+                       "AND AssignmentSubmission.studentID = GradeBook.StudentID "
+                       "LEFT JOIN Exam ON GradeBook.examID = Exam.examID "
+                       "LEFT JOIN Whiteboard.Assignment ON AssignmentSubmission.assignID = Assignment.assignID "
+                       "LEFT JOIN Whiteboard.Users ON ID = GradeBook.StudentID "
+                       "WHERE Assignment.courseID = %s OR Exam.courseID = %s ORDER BY Users.lastName;"
+                       % (courseID,courseID))
+
+        gradeDict = []
+        perivousID = 0
+        for (StudentID, grade, description, title, firstName,lastName) in cursor:
+            currentID = StudentID
+            if perivousID == 0:
+                stuGrade = {"studentID": StudentID, "name": firstName + " " + lastName,
+                            "assignment": [], "exam": [], "final": finalGrade[StudentID]}
+            if perivousID != currentID  and perivousID != 0:
+                gradeDict.append(stuGrade)
+                stuGrade = {"studentID": StudentID, "name": firstName + " " + lastName,
+                            "assignment": [], "exam": [], "final": finalGrade[StudentID]}
+
+            if title is None:       # Not Assignment
+                stuGrade["exam"].append({"examTitle": description, "examGrade":grade})
+            else:                   # Not Exam
+                stuGrade["assignment"].append({"assignmentTitle":title, "assignmentGrade":grade})
+
+
+            # if perivousID != currentID
+            perivousID = StudentID
+        if stuGrade:
+            gradeDict.append(stuGrade)
+            # gradeDict.append(stuGrade)
+
+    if not gradeDict:
+        return -1
+    return gradeDict
+
+
+
 #     if uType == 1:  # Professor
 #         qry = "SELECT TakenClasses.studentID, TakenClasses.grade, Users.firstName,Users.lastName,Courses.courseName " \
 #               "FROM Courses NATURAL JOIN TakenClasses " \

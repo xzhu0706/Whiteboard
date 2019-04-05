@@ -2,6 +2,7 @@ from flask import Flask, jsonify,request
 from flask_cors import CORS
 from DB_init import db_User
 # from DB_Post import postUser
+# from DB_Post import postUser
 import datetime
 
 app = Flask(__name__)
@@ -146,7 +147,7 @@ def createAss():
 	title = json_load['title']
 	task = json_load['task']
 	# for deadline: just give n day after current day
-	deadlineDay = json_load['deadline']
+	deadlineDay = int(json_load['deadline'])
 	deadline = datetime.datetime.combine(datetime.date.today()+datetime.timedelta(days=deadlineDay), datetime.time.max)
 	gradeTotal = json_load['gradeTotal']
 
@@ -217,18 +218,43 @@ def gradeSubmission():
 
 	boolean = User.submit_Grade(submissionID, grade)
 	return jsonify(update=boolean)
-# ################################################################
 
+
+# For student return a dict of {"assignment":[], "exam":[], "final": number}
+# 		where "assignment" is list of {"assignmentTitle", "assignmentGrade"}
+# 			 "exam" is list of {"examTitle", "examGrade"}
+
+# For professor return list of dict
+# 		{"studentID", "name", "assignment":[], "exam":[], "final"}
+# 		"assignment" and "exam" have same layout as student
 @app.route("/api/grade/<courseID>/<userID>", methods=['GET'])
 def getGrade(courseID,userID):
-	submissionList = User.get_Submission(courseID)###########
-
+	submissionList = User.get_Grades(courseID,userID)
 	if submissionList == -1:
 		return jsonify(found=False), 404
 	else:
 		return jsonify(submissionList), 200
 
-#
+@app.route("/api/exam", methods=['POST'])
+def createExam():
+	json_load = request.get_json()
+	courseID = json_load['courseID']
+	gradeTotal = json_load['gradeTotal']
+	examTitle = json_load['examTitle']
+	boolean = User.create_Exam(courseID, examTitle, gradeTotal)
+	return jsonify(update=boolean)
+
+@app.route("/api/gradeExam", methods=['POST'])
+def gradeExam():
+	json_load = request.get_json()
+	studentID = json_load['studentID']
+	examID = json_load['examID']
+	grade = json_load['grade']
+
+	boolean = User.submit_ExamGrade(studentID, examID, grade)
+	return jsonify(update=boolean)
+
+## ################################################################
 # # @app.route("/api/grades", methods=['GET'])
 # # given: userId & courseId
 # # return:
