@@ -24,7 +24,7 @@ def create_type(type,cursor,num):
     elif type =="TakenClasses":
         create_random_takenClasses(cursor,num)
     elif type == "Assignment":
-        create_random_assignment(cursor, num,7)
+        create_random_assignment(cursor, num, 7)
     elif type =="AssignmentSubmission":
         create_random_assignmentSubmission(cursor,num)
     elif type == "Exam":
@@ -100,7 +100,7 @@ def main(argv,type,num, database):
 
 table = ["Users","Courses","TakenClasses","Assignment","AssignmentSubmission","Exam","GradeBook","ClassAnnouncement","ClassMaterials"]
 action = ["init", "create","query","deleteDB"]
-nums = [50,4,50,10,50,10,30,6,6]
+nums = [50,3,40,10,50,5,50,6,6]
 num = 5
 
 main("",type,num,database)

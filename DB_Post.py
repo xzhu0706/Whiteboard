@@ -8,8 +8,8 @@ def uploadMaterial(cursor, courseID,material):
     try:
         cursor.execute(qry, (courseID,material))
         return True
-    except mysql.connector.Error as err:
-        print(err)
+    except mysql.connector.Error :
+        # print(err)
         return False
 
 
@@ -18,14 +18,14 @@ def makeAnnouncement(cursor,courseID,announcement):
     try:
         cursor.execute(qry, (courseID,announcement))
         return True
-    except mysql.connector.Error as err:
+    except mysql.connector.Error:
         return False
 
-def createAssignment(cursor,courseID,deadline,task,gradeTotal):
-    qry = "INSERT INTO Assignment (courseID,deadline,task,gradeTotal) " \
-          "VALUE (%s,%s,%s,%s);"
+def createAssignment(cursor,courseID,deadline,title,task,gradeTotal):
+    qry = "INSERT INTO Assignment (courseID,deadline,title, task,gradeTotal) " \
+          "VALUE (%s,%s,%s,%s,%s);"
     try:
-        cursor.execute(qry, (courseID,deadline,task,gradeTotal))
+        cursor.execute(qry, (courseID,deadline,title,task,gradeTotal))
         return True
     except mysql.connector.Error:
         return False
@@ -55,19 +55,18 @@ def del_Assignment(cursor,assignID):
         return False
 
 def submit_Assignment(cursor,assignID,studentID,content):
-    isGraded = 1
-    qry = "INSERT INTO AssignmentSubmission(studentID,assignID,isGraded,file) VALUES (%s,%s,%s,%s);"
+    qry = "INSERT INTO AssignmentSubmission(studentID,assignID,file) VALUES (%s,%s,%s,%s);"
 
     try:
-        cursor.execute(qry, (studentID,assignID,isGraded,content))
+        cursor.execute(qry, (studentID,assignID,content))
         return True
     except mysql.connector.Error:
         return False
 
 def submit_grade(cursor, submissionID, grade):
     try:
-        cursor.execute("UPDATE AssignmentSubmission SET isGraded = 1 "
-                       "WHERE submissionID = %s;" % submissionID)
+        # cursor.execute("UPDATE AssignmentSubmission SET isGraded = 1 "
+        #                "WHERE submissionID = %s;" % submissionID)
 
         cursor.execute("SELECT studentID FROM AssignmentSubmission "
                        "WHERE submissionID = %s;" % submissionID)

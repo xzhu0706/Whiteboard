@@ -2,7 +2,7 @@ import random
 import datetime
 import string
 import mysql.connector
-
+import numpy as np
 
 def random_users():
     last = ("Aaren","Aarika","Oliver","Jacob","William","Sophia","Emma","Isabella")
@@ -105,15 +105,16 @@ def create_random_assignment(cursor,num,days):
         courseIDs.append(courseID[0])
 
     check = 0
-    task = 'task'
+    task = 'task description'
     gradeTotal = 100
     for i in range(num):
+        title="Assignment"+''.join(random.choices(string.digits,k=1))
         courseID = random.choice(courseIDs)
         deadline = datetime.datetime.combine(datetime.date.today()+datetime.timedelta(days=days), datetime.time.max)
-        qry = "INSERT INTO Assignment (courseID,deadline,task,gradeTotal) VALUES (%s,%s,%s,%s);"
+        qry = "INSERT INTO Assignment (courseID,deadline,title, task,gradeTotal) VALUES (%s,%s,%s,%s,%s);"
 
         try:
-            cursor.execute(qry, (courseID, deadline, task, gradeTotal))
+            cursor.execute(qry, (courseID, deadline, title, task, gradeTotal))
         except mysql.connector.Error as err:
             i -= 1
             check += 1
@@ -132,18 +133,17 @@ def create_random_assignmentSubmission(cursor,num):
         assID.append(assignID)
 
     check = 0
-    isGraded = 0
     file = "File"
 
     for i in range(num):
         studentID = stuID[i]
         assignID = assID[i]
 
-        qry = "INSERT INTO AssignmentSubmission(studentID,assignID,isGraded,file) VALUES (%s,%s,%s,%s);"
+        qry = "INSERT INTO AssignmentSubmission(studentID,assignID,file) VALUES (%s,%s,%s);"
 
         try:
-            cursor.execute(qry, (studentID, assignID, isGraded, file))
-        except mysql.connector.Error as err:
+            cursor.execute(qry, (studentID, assignID, file))
+        except mysql.connector.Error:
             i -= 1
             check += 1
 
@@ -171,52 +171,37 @@ def create_random_gradeBook(cursor, num):
                    "FROM TakenClasses NATURAL JOIN Assignment JOIN AssignmentSubmission "
                    "ON TakenClasses.studentID = AssignmentSubmission.studentID "
                    "AND Assignment.assignID=AssignmentSubmission.assignID;")
-
-
     subTuple = []
     for (studentID,courseID,submissionID) in cursor:
         subTuple.append((studentID,courseID,submissionID))
 
+
     cursor.execute("SELECT studentID,courseID,examID From "
                     "Exam NATURAL JOIN TakenClasses;")
-
     exTuple = []
     for (studentID,courseID,examID) in cursor:
         exTuple.append((studentID,courseID,examID))
 
+    sindex = np.random.permutation(len(subTuple))
+    eindex = np.random.permutation(len(exTuple))
+    si,ei = 0,0
 
-    qry = "INSERT INTO GradeBook(studentID, submissionID,grade) VALUES (%s,%s,%s);"
-
-    if num < len(subTuple):
-        import numpy as np
-        index = np.random.permutation(len(subTuple))
-        for i in range(num):
-            studentID, courseID, submissionID = subTuple[index[i]]
-            grade = random.randint(50, 100)
-            cursor.execute(qry, (studentID, submissionID,grade))
-            cursor.execute("UPDATE AssignmentSubmission SET isGraded = 1 WHERE submissionID = %s;"%submissionID)
-    else:
-        for i in range(len(subTuple)):
-            studentID, courseID, submissionID = subTuple[i]
-            grade = random.randint(50, 100)
-            cursor.execute(qry, (studentID, submissionID, grade))
-            cursor.execute("UPDATE AssignmentSubmission SET isGraded = 1 WHERE submissionID = %s;" % submissionID)
-
-        qry = "INSERT INTO GradeBook(studentID, examID,grade) VALUES (%s,%s,%s);"
-        if num - len(subTuple) < len(exTuple):
-
-            for i in range(num - len(subTuple)):
-                studentID, courseID, examID = exTuple[i]
+    for _ in range(num):
+        try:
+            if random.uniform(0, 1) < 0.8:
+                qry = "INSERT INTO GradeBook(studentID, submissionID,grade) VALUES (%s,%s,%s);"
+                studentID, courseID, submissionID = subTuple[sindex[si]]
+                grade = random.randint(50, 100)
+                cursor.execute(qry, (studentID, submissionID, grade))
+                si += 1
+            else:
+                qry = "INSERT INTO GradeBook(studentID, examID,grade) VALUES (%s,%s,%s);"
+                studentID, courseID, examID = exTuple[eindex[ei]]
                 grade = random.randint(50, 100)
                 cursor.execute(qry, (studentID, examID, grade))
-        else:
-            for i in range(len(exTuple)):
-                studentID, courseID, examID = exTuple[i]
-                grade = random.randint(50, 100)
-                cursor.execute(qry, (studentID, examID, grade))
-
-
-        print("Insert %s tuple into Gradebook" % str(len(subTuple)+len(exTuple)))
+                ei+= 1
+        except mysql.connector.Error:
+            print("Insert %s tuple into Gradebook" % str(si+ei) )
 
 
 
