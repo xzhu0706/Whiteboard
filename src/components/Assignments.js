@@ -22,6 +22,7 @@ class Assignments extends Component {
 		this.handleCreateAssignment = this.handleCreateAssignment.bind(this);
 		this.handleDownloadAssignment = this.handleDownloadAssignment.bind(this);
 		this.handleSubmitAssignment = this.handleSubmitAssignment.bind(this);
+		this.handleSeeSubmissions = this.handleSeeSubmissions.bind(this);
 	}
 
 	componentDidMount() {
@@ -41,6 +42,7 @@ class Assignments extends Component {
 						time={"Deadline: " + assignment.deadline}
 						onClick={this.handleOnClickAssignment}
 						handleSubmitAssign={this.toggleSubmitAssignmentModal}
+						handleSeeSubmissions={this.handleSeeSubmissions}
 					/>
 				);
 			})
@@ -53,7 +55,7 @@ class Assignments extends Component {
 		this.setState({
 			selectedAssignment: assignmentID
 		});
-		console.log(this.state.selectedAssignment);
+		// console.log(this.state.selectedAssignment);
 		if (this.props.assignments.length > 0) {
 			const assignments = this.props.assignments.map((assignment) => {
 				return (
@@ -68,6 +70,7 @@ class Assignments extends Component {
 						bgColor={assignmentID === assignment.assignmentID ? '#ea8383' : '' }
 						borderColor={assignmentID === assignment.assignmentID ? 'red' : ''}
 						handleSubmitAssign={this.toggleSubmitAssignmentModal}
+						handleSeeSubmissions={this.handleSeeSubmissions}
 					/>
 				);
 			})
@@ -99,13 +102,12 @@ class Assignments extends Component {
 		}	}
 
 	handleCreateAssignment(event, assignment) {
-		event.preventDefault();
+		//event.preventDefault();
 		// TODO*****************************************************
-		// api call did not work
 		const data = {
 			courseID: this.props.courseID,
 			task: assignment,
-			deadlineDay: 7, //need to let user choose the day
+			deadline: 7, //need to let user choose the day
 			gradeTotal: 100, //need to let user input the grade
 		}
 		console.log(data);
@@ -160,9 +162,14 @@ class Assignments extends Component {
 				// window.location.replace("/error");
 				console.log('error while posting Assignment')
 			}
-
 		});
+	}
 
+	handleSeeSubmissions(e) {
+		console.log('see submissions for', this.state.selectedAssignment);
+		// TODO
+		// Make a grade assignment page for professor to see and grade submissions from students
+		window.location = '/submissions/' + this.state.selectedAssignment
 	}
 
 	handleDownloadAssignment(e) {

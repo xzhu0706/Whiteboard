@@ -195,7 +195,7 @@ def submitAss():
 # 				submissionID,content, and submitTime will be NULL, and isSubmit will be False
 # 		found=False if No Student Found for that assignment
 
-@app.route("/api/submission/<assignID>", methods=['GET'])
+@app.route("/api/submissions/<assignID>", methods=['GET'])
 def getSubmission(assignID):
 	submissionList = User.get_Submission(assignID)
 
