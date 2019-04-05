@@ -152,7 +152,7 @@ class Materials extends Component {
 						/>
 						<Button 
 							className="other-button"
-							color="success"
+							color="secondary"
 							onClick={this.handleDownloadMaterial}
 						>
 							Download
@@ -186,7 +186,7 @@ class Materials extends Component {
 					</div>
 					<Button 
 						className="other-button"
-						color="success"
+						color="secondary"
 						onClick={this.handleDownloadMaterial}
 					>
 						Download

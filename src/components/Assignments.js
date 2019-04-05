@@ -3,6 +3,7 @@ import Card from './Card.js';
 import { Button } from 'reactstrap';
 import SingleInputFieldModal from './modals/SingleFieldModal.js';
 import cookie from 'react-cookies';
+import CreateAssignmentModal from './modals/CreateAssignmentModal.js';
 
 class Assignments extends Component {
   constructor(props) {
@@ -101,17 +102,18 @@ class Assignments extends Component {
 			window.location.reload();
 		}	}
 
-	handleCreateAssignment(event, assignment) {
-		//event.preventDefault();
+	handleCreateAssignment(event) {
+		event.preventDefault();
 		// TODO*****************************************************
+
 		const data = {
 			courseID: this.props.courseID,
-			task: assignment,
-			title: 'title',
-			deadline: 7, //need to let user choose the day
-			gradeTotal: 100, //need to let user input the grade
+			title: event.target.title.value,
+			task: event.target.task.value,
+			deadline: event.target.deadline.value, //need to let user choose the day
+			gradeTotal: event.target.gradeTotal.value, //need to let user input the grade
 		}
-		console.log(data);
+		 console.log(data);
 
 		fetch('http://localhost:5000/api/createAssignment', {
 			method: 'POST',
@@ -203,7 +205,13 @@ class Assignments extends Component {
 
 					<div className="card-footer">
 						{/* for create, delete buttons */}
-						<SingleInputFieldModal
+						{/* <SingleInputFieldModal
+							isOpen={this.state.createAssignmentModal}
+							toggle={this.toggleCreateAssignmentModal}
+							handleSubmit={this.handleCreateAssignment}
+							header="New Assignment"
+						/> */}
+						<CreateAssignmentModal
 							isOpen={this.state.createAssignmentModal}
 							toggle={this.toggleCreateAssignmentModal}
 							handleSubmit={this.handleCreateAssignment}

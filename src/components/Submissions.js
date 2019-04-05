@@ -71,8 +71,8 @@ class Submissions extends Component {
 
 	handleGradeSubmission(e, submissionID, grade) {
 		//TODO
-		console.log('enter grade for', submissionID, grade);
 		e.preventDefault();
+		console.log('enter grade for', submissionID, grade);
 		if (grade >= 0) {
 			const data = {
 				submissionID: submissionID,
@@ -100,6 +100,7 @@ class Submissions extends Component {
 				}
 			});
 		}
+		window.location.reload();
 	}
 
 	handleDownloadSubmission(e) {

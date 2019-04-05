@@ -18,7 +18,7 @@ class SingleInputFieldModal extends Component {
                     <FormGroup row>
                       {/* <Label for="exampleEmail" sm={2}>Email</Label> */}
                       <Col lg={10}>
-                        <Input type="text" name="input"  />
+                        <textarea required type="text" name="input" className="form-control" style={{height: 100+'px'}}  />
                       </Col>
                     </FormGroup>
                     <FormGroup>
