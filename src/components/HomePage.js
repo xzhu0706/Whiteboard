@@ -56,7 +56,7 @@ class HomePage extends Component {
 			<div>
 				<h1>Welcome to your home page, {this.state.firstName} {this.state.lastName}!</h1>
 				
-				{this.state.courses == [] ? <h2>No courses found</h2> : this.state.courses }
+				{this.state.courses.length === 0 ? (<h5>No courses found</h5>) : this.state.courses }
 
 			</div>
 		);

@@ -9,7 +9,6 @@ class Assignments extends Component {
     super(props);
     this.state = {
 			assignments: 'None',
-			assignmentsList: [],
 			selectedAssignment: '',
 			createAssignmentModal: false,
 			submitAssignmentModal: false,
@@ -26,10 +25,6 @@ class Assignments extends Component {
 	}
 
 	componentDidMount() {
-		console.log('props for Assignment component',this.props);
-		this.setState({
-			assignmentsList: this.props.assignments
-		})
 		if (this.props.assignments.length > 0) {
 			const assignments = this.props.assignments.map((assignment) => {
 				return (
@@ -37,13 +32,16 @@ class Assignments extends Component {
 						id={assignment.assignmentID}
 						isProf={this.props.isProf}
 						isAssignment={true}
-						notSubmitted={true} //need to modify later, need this from backend
+						isSubmitted={assignment.isSubmitted}
+						isLate={assignment.isLate}
+						pastDue={assignment.pastDue}
 						title={assignment.title}
 						body={assignment.task}
 						time={"Deadline: " + assignment.deadline}
 						onClick={this.handleOnClickAssignment}
 						handleSubmitAssign={this.toggleSubmitAssignmentModal}
 						handleSeeSubmissions={this.handleSeeSubmissions}
+						handleDownload={this.handleDownloadAssignment}
 					/>
 				);
 			})
@@ -52,31 +50,31 @@ class Assignments extends Component {
 	}
 	
 	handleOnClickAssignment(e, assignmentID) {
-		console.log(assignmentID);
-		this.setState({
-			selectedAssignment: assignmentID
-		});
-		// console.log(this.state.selectedAssignment);
-		if (this.props.assignments.length > 0) {
-			const assignments = this.props.assignments.map((assignment) => {
-				return (
-					<Card 
-						id={assignment.assignmentID}
-						isProf={this.props.isProf}
-						isAssignment={true}
-						notSubmitted={true} //need to modify later, need this from backend
-						title={assignment.title}
-						body={assignment.task}
-						time={"Deadline: " + assignment.deadline}
-						onClick={this.handleOnClickAssignment}
-						bgColor={assignmentID === assignment.assignmentID ? '#ea8383' : '' }
-						borderColor={assignmentID === assignment.assignmentID ? 'red' : ''}
-						handleSubmitAssign={this.toggleSubmitAssignmentModal}
-						handleSeeSubmissions={this.handleSeeSubmissions}
-					/>
-				);
-			})
-			this.setState({ assignments });
+		if (cookie.load('userType') == 1) {
+			console.log(assignmentID);
+			this.setState({
+				selectedAssignment: assignmentID
+			});
+			// console.log(this.state.selectedAssignment);
+			if (this.props.assignments.length > 0) {
+				const assignments = this.props.assignments.map((assignment) => {
+					return (
+						<Card 
+							id={assignment.assignmentID}
+							isProf={this.props.isProf}
+							isAssignment={true}
+							pastDue={assignment.pastDue}
+							title={assignment.title}
+							body={assignment.task}
+							time={"Deadline: " + assignment.deadline}
+							onClick={this.handleOnClickAssignment}
+							bgColor={assignmentID === assignment.assignmentID ? '#b0e5f4' : '' }
+							handleSeeSubmissions={this.handleSeeSubmissions}
+						/>
+					);
+				})
+				this.setState({ assignments });
+			}
 		}
 	}
 
@@ -140,7 +138,6 @@ class Assignments extends Component {
 
 	handleSubmitAssignment(e, submittedAssignment) {
 		console.log('submit assignment for', this.state.selectedAssignment);
-		e.preventDefault();
 		const data = {
 			assignID: this.state.selectedAssignment,
 			studentID: cookie.load('userID'),
@@ -168,15 +165,13 @@ class Assignments extends Component {
 		});
 	}
 
-	handleSeeSubmissions(e) {
-		console.log('see submissions for', this.state.selectedAssignment);
-		// TODO
-		// Make a grade assignment page for professor to see and grade submissions from students
-		window.location = '/submissions/' + this.state.selectedAssignment
+	handleSeeSubmissions(e, assignmentID) {
+		console.log('see submissions for', assignmentID);
+		window.location = '/submissions/' + assignmentID
 	}
 
-	handleDownloadAssignment(e) {
-		console.log('download assignment', this.state.selectedAssignment);
+	handleDownloadAssignment(e, assignmentID) {
+		console.log('download assignment', assignmentID);
 		//TODO: if we implement uploading&downloading files 
 	}
 
@@ -254,13 +249,13 @@ class Assignments extends Component {
 					<div className="card-body">
 						{this.state.assignments}
 					</div>
-					<Button 
+					{/* <Button 
 						className="other-button"
 						color="success"
 						onClick={this.handleDownloadAssignment}
 					>
 						Download
-					</Button>
+					</Button> */}
 				</div>
 			);
 		}

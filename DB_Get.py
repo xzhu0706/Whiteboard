@@ -107,11 +107,14 @@ def get_Assignments(cursor, courseID, ID):
     if uType == 0:
         for dict in assignmentInfo:
             assignID = dict['assignmentID']
-            cursor.execute("SELECT submissionID FROM AssignmentSubmission "
+            cursor.execute("SELECT submissionID, uploadTime FROM AssignmentSubmission "
                            "WHERE studentID = %s AND assignID = %s;" % (ID,assignID))
             dict['isSubmitted'] = False
-            for (submissionID) in cursor:
+            dict['isLate'] = False
+            for (submissionID, uploadTime) in cursor:
                 dict['isSubmitted'] = True
+                if dict['deadline'] < uploadTime.strftime("%m/%d/%Y, %H:%M:%S"):
+                    dict['isLate'] = True
 
     if not assignmentInfo:
         return -1
@@ -140,15 +143,15 @@ def get_submission(cursor, assignID):
                                    'content': None, 'gradeTotal': gradeTotal,
                                    'submitTime': None, 'grade':None,
                                    'studentName': firstName + ' ' + lastName,
-                                   'isSubmit': False, 'isGraded': False,
+                                   'isSubmitted': False, 'isGraded': False,
                                    }
         if submissionID is None:
             submissionInfo.append(dict)
         else:
             dict['submissionID'] = submissionID
             dict['content'] = file
-            dict['submitTime'] = uploadTime
-            dict['isSubmit'] = True
+            dict['submitTime'] = uploadTime.strftime("%m/%d/%Y, %H:%M:%S")
+            dict['isSubmitted'] = True
             dict['grade'] = grade
 
             dict['isGraded'] = True
