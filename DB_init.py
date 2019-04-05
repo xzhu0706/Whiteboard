@@ -41,11 +41,25 @@ class db_User():
 
 
 
+
+
     # Update DB
     def update(self,result):
         if result:
             self.cnx.commit()
         return result
+
+    def updateFinalgrade(self,courseID,userID):
+        result = DB_Post.update_grade(self.cursor, courseID, userID)
+        return self.update(result)
+
+    def get_Grades(self, courseID,userID):
+        result = self.updateFinalgrade(courseID, userID)
+        if result == True:
+            return DB_Get.get_grades(self.cursor, courseID,userID)
+        else:
+            return -1
+
 
     def uploadMaterial(self,courseID,material):
         result = DB_Post.uploadMaterial(self.cursor,courseID,material)
@@ -72,11 +86,18 @@ class db_User():
         result = DB_Post.del_Assignment(self.cursor, assignID)
         return self.update(result)
 
-
     def submit_Assignment(self,assignID,studentID,content):
         result = DB_Post.submit_Assignment(self.cursor,assignID,studentID,content)
         return self.update(result)
 
     def submit_Grade(self,submissionID, grade):
         result = DB_Post.submit_grade(self.cursor, submissionID, grade)
+        return self.update(result)
+
+    def create_Exam(self, courseID, description, gradeTotal = 100):
+        result = DB_Post.createExam(self.cursor, courseID, description,gradeTotal)
+        return self.update(result)
+
+    def submit_ExamGrade(self,studentID, examID, grade):
+        result = DB_Post.submit_Examgrade(self.cursor, studentID, examID, grade)
         return self.update(result)
