@@ -38,6 +38,7 @@ class Assignments extends Component {
 						isProf={this.props.isProf}
 						isAssignment={true}
 						notSubmitted={true} //need to modify later, need this from backend
+						title={assignment.title}
 						body={assignment.task}
 						time={"Deadline: " + assignment.deadline}
 						onClick={this.handleOnClickAssignment}
@@ -64,6 +65,7 @@ class Assignments extends Component {
 						isProf={this.props.isProf}
 						isAssignment={true}
 						notSubmitted={true} //need to modify later, need this from backend
+						title={assignment.title}
 						body={assignment.task}
 						time={"Deadline: " + assignment.deadline}
 						onClick={this.handleOnClickAssignment}
@@ -107,6 +109,7 @@ class Assignments extends Component {
 		const data = {
 			courseID: this.props.courseID,
 			task: assignment,
+			title: 'title',
 			deadline: 7, //need to let user choose the day
 			gradeTotal: 100, //need to let user input the grade
 		}
@@ -137,7 +140,7 @@ class Assignments extends Component {
 
 	handleSubmitAssignment(e, submittedAssignment) {
 		console.log('submit assignment for', this.state.selectedAssignment);
-
+		e.preventDefault();
 		const data = {
 			assignID: this.state.selectedAssignment,
 			studentID: cookie.load('userID'),

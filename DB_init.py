@@ -33,8 +33,8 @@ class db_User():
     def get_Announcement(self, courseID):
         return DB_Get.get_Announcement(self.cursor, courseID)
 
-    def get_Assignments(self, courseID):
-        return DB_Get.get_Assignments(self.cursor, courseID)
+    def get_Assignments(self, courseID, ID):
+        return DB_Get.get_Assignments(self.cursor, courseID,ID)
 
     def get_Submission(self,assignID):
         return DB_Get.get_submission(self.cursor,assignID)
@@ -64,8 +64,8 @@ class db_User():
         result = DB_Post.del_Announcement(self.cursor, announcementID)
         return self.update(result)
 
-    def createAssignment(self,courseID,deadline,task,gradeTotal):
-        result = DB_Post.createAssignment(self.cursor, courseID,deadline,task,gradeTotal)
+    def createAssignment(self,courseID,deadline,title, task,gradeTotal):
+        result = DB_Post.createAssignment(self.cursor, courseID,deadline,title,task,gradeTotal)
         return self.update(result)
 
     def del_Assignment(self, assignID):

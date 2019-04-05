@@ -26,8 +26,10 @@ class Card extends Component {
             }}
           >
             <div className="header thumbnail d-flex">
-              {/* {this.props.header} */}
               <Button className="jutify-content-sm-end" onClick={this.props.handleSeeSubmissions}>Submissions</Button>
+            </div>
+            <div className="card-title">
+              {this.props.title}
             </div>
             <div className="card-body">
               <h5 className="card-text">{this.props.body}</h5>
@@ -46,8 +48,10 @@ class Card extends Component {
             }}
           >
             <div className="header thumbnail d-flex">
-              {/* {this.props.header} */}
               <Button className="jutify-content-sm-end" onClick={this.props.notSubmitted ? this.props.handleSubmitAssign : (e) => {}}>Submit</Button>
+            </div>
+            <div className="card-title">
+              {this.props.title}
             </div>
             <div className="card-body">
               <h5 className="card-text">{this.props.body}</h5>

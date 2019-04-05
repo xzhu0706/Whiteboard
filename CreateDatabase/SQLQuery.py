@@ -33,11 +33,11 @@ def query_assignment(cursor):
     print("*" * 80)
 
 def query_assignmentSubmission(cursor):
-    qry = ("SELECT submissionID, studentID, assignID, isGraded, uploadTime FROM AssignmentSubmission;")
+    qry = ("SELECT submissionID, studentID, assignID, uploadTime FROM AssignmentSubmission;")
     cursor.execute(qry)
     print("*" * 80)
-    for (submissionID, studentID, assignID, isGraded, uploadTime) in cursor:
-        print(f"{submissionID} : {studentID}, {assignID},  {isGraded}, {uploadTime}")
+    for (submissionID, studentID, assignID, uploadTime) in cursor:
+        print(f"{submissionID} : {studentID}, {assignID}, {uploadTime}")
     print("*" * 80)
 
 def query_exam(cursor):
