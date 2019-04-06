@@ -18,6 +18,7 @@ class db_User():
             raise err
 
 
+    # Get info from DB
     def login_check(self, username, password):
         return DB_Get.login_check(self.cursor,username, password)
 
@@ -36,8 +37,11 @@ class db_User():
     def get_Assignments(self, courseID, ID):
         return DB_Get.get_Assignments(self.cursor, courseID,ID)
 
-    def get_Submission(self,assignID):
-        return DB_Get.get_submission(self.cursor,assignID)
+    def get_Submission(self,assignmentID):
+        return DB_Get.get_submission(self.cursor,assignmentID)
+
+    def get_Grades(self, courseID,userID):
+        return DB_Get.get_grades(self.cursor, self.cnx, courseID,userID)
 
 
 
@@ -49,55 +53,55 @@ class db_User():
             self.cnx.commit()
         return result
 
-    def updateFinalgrade(self,courseID,userID):
-        result = DB_Post.update_grade(self.cursor, courseID, userID)
-        return self.update(result)
-
-    def get_Grades(self, courseID,userID):
-        result = self.updateFinalgrade(courseID, userID)
-        if result == True:
-            return DB_Get.get_grades(self.cursor, courseID,userID)
-        else:
-            return -1
-
-
+    # Create
     def uploadMaterial(self,courseID,material):
         result = DB_Post.uploadMaterial(self.cursor,courseID,material)
         return self.update(result)
 
-    def del_Material(self, materialID):
-        result = DB_Post.del_Material(self.cursor,materialID)
-        return self.update(result)
-
-
     def makeAnnouncement(self,courseID,announcement):
         result = DB_Post.makeAnnouncement(self.cursor, courseID,announcement)
-        return self.update(result)
-
-    def del_Announcement(self, announcementID):
-        result = DB_Post.del_Announcement(self.cursor, announcementID)
         return self.update(result)
 
     def createAssignment(self,courseID,deadline,title, task,gradeTotal):
         result = DB_Post.createAssignment(self.cursor, courseID,deadline,title,task,gradeTotal)
         return self.update(result)
 
-    def del_Assignment(self, assignID):
-        result = DB_Post.del_Assignment(self.cursor, assignID)
+
+    def create_Exam(self, courseID, description, gradeTotal,examPercentage):
+        result = DB_Post.createExam(self.cursor, courseID, description,gradeTotal,examPercentage)
         return self.update(result)
 
-    def submit_Assignment(self,assignID,studentID,content):
-        result = DB_Post.submit_Assignment(self.cursor,assignID,studentID,content)
+    # Submit Grade or Assignment
+    def submit_Assignment(self,assignmentID,studentID,content):
+        result = DB_Post.submit_Assignment(self.cursor,assignmentID,studentID,content)
         return self.update(result)
 
-    def submit_Grade(self,submissionID, grade):
-        result = DB_Post.submit_grade(self.cursor, submissionID, grade)
+    def submit_AssignmentGrade(self,assignmentID, studentID, assignmentGrade):
+        result = DB_Post.submit_AssignmentGrade(self.cursor,self.cnx, assignmentID, studentID, assignmentGrade)
         return self.update(result)
 
-    def create_Exam(self, courseID, description, gradeTotal = 100):
-        result = DB_Post.createExam(self.cursor, courseID, description,gradeTotal)
+    def submit_SubmissionGrade(self, submissionID, assignmentGrade):
+        result = DB_Post.submit_SubmissionGrade(self.cursor,self.cnx, submissionID, assignmentGrade)
         return self.update(result)
 
-    def submit_ExamGrade(self,studentID, examID, grade):
-        result = DB_Post.submit_Examgrade(self.cursor, studentID, examID, grade)
+    def submit_ExamGrade(self,studentID, examID, examGrade):
+        result = DB_Post.submit_ExamGrade(self.cursor, self.cnx, studentID, examID, examGrade)
         return self.update(result)
+
+    # Delete
+    def del_Material(self, materialID):
+        result = DB_Post.del_Material(self.cursor,materialID)
+        return self.update(result)
+
+    def del_Announcement(self, announcementID):
+        result = DB_Post.del_Announcement(self.cursor, announcementID)
+        return self.update(result)
+
+    def del_Assignment(self, assignmentID):
+        result = DB_Post.del_Assignment(self.cursor, assignmentID)
+        return self.update(result)
+
+    def del_Exam(self, examID):
+        result = DB_Post.del_Exam(self.cursor, examID)
+
+

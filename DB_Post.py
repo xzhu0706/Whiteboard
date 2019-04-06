@@ -4,7 +4,7 @@ import mysql.connector
 # ########## Create
 
 def uploadMaterial(cursor, courseID,material):
-    qry = "INSERT INTO ClassMaterials (courseID,material) VALUES (%s,%s);"
+    qry = "INSERT INTO ClassMaterial (courseID,material) VALUES (%s,%s);"
     try:
         cursor.execute(qry, (courseID,material))
         return True
@@ -26,118 +26,168 @@ def createAssignment(cursor,courseID,deadline,title,task,gradeTotal):
           "VALUE (%s,%s,%s,%s,%s);"
     try:
         cursor.execute(qry, (courseID,deadline,title,task,gradeTotal))
+
+        assignmentID = 0
+
+        cursor.execute("SELECT max(assignmentID) FROM Whiteboard2.Assignment;")
+        for (assignmentID) in cursor:
+            assignmentID = assignmentID[0]
+
+        cursor.execute("SELECT studentID FROM TakenClasses WHERE courseID = %s" % courseID)
+        studentIDs = []
+        for (studentID) in cursor:
+            studentIDs.append(studentID[0])
+
+        qry = "INSERT INTO AssignmentGrade(assignmentID,studentID) VALUE (%s,%s);"
+        for studentID in studentIDs:
+            cursor.execute(qry, (assignmentID,studentID))
         return True
-    except mysql.connector.Error:
+    except mysql.connector.Error as err:
+        print("Error in createAssignment")
+        print(err)
         return False
 
-def createExam(cursor, courseID, description,gradeTotal):
-
+def createExam(cursor, courseID, description,gradeTotal,examPercentage):
     try:
-        qry = "INSERT INTO Exam(courseID,gradeTotal,description) VALUES (%s,%s,%s);"
-        cursor.execute(qry, (courseID, gradeTotal, description))
+        qry = "INSERT INTO Exam(courseID,gradeTotal,description,examPercentage) VALUES (%s,%s,%s,%s);"
+        cursor.execute(qry, (courseID, gradeTotal, description,examPercentage))
         return True
-    except mysql.connector.Error:
+    except mysql.connector.Error as err:
+        print("Error in createExam")
+        print(err)
         return False
 
 # Submit Grade or Assignment
-def submit_Assignment(cursor,assignID,studentID,content):
-    qry = "INSERT INTO AssignmentSubmission(studentID,assignID,file) VALUES (%s,%s,%s);"
-
+def submit_Assignment(cursor,assignmentID,studentID,content):
+    qry = "INSERT INTO AssignmentSubmission(studentID,assignmentID,file) VALUES (%s,%s,%s);"
     try:
-        cursor.execute(qry, (studentID,assignID,content))
+        cursor.execute(qry, (studentID,assignmentID,content))
         return True
     except mysql.connector.Error:
         return False
 
-def submit_grade(cursor, submissionID, grade):
+def submit_AssignmentGrade(cursor,cnx, assignmentID, studentID, assignmentGrade):
     try:
-        cursor.execute("SELECT studentID, gradeTotal FROM AssignmentSubmission "
-                       "NATURAL JOIN Assignment WHERE submissionID = %s;" % submissionID)
+        qry = "INSERT INTO AssignmentGrade(assignmentID,studentID, assignmentGrade) VALUE (%s,%s,%s)"
+        cursor.execute(qry, (assignmentID, studentID, assignmentGrade))
 
-        for (studentID,gradeTotal) in cursor:
+        cursor.execute("SELECT courseID FROM Assignment "
+                       "WHERE assignmentID = %s;" % assignmentID)
+        for(courseID) in cursor:
+            cID = courseID[0]
+
+        finalGrade = update_finalgrade(cursor,cnx,cID,studentID)
+        if finalGrade == False:
+            return False
+        return True
+    except mysql.connector.Error as err:
+        print("Error in submit_AssignmentGrade")
+        print(err)
+        return False
+
+def submit_SubmissionGrade(cursor, cnx, submissionID, assignmentGrade):
+    try:
+        cursor.execute("SELECT studentID, assignmentID FROM AssignmentSubmission "
+                       "WHERE submissionID = %s;" % submissionID)
+
+        for (studentID,assignmentID) in cursor:
             sID = studentID
-            gradeT = gradeTotal
-        gradePercent = float(grade)/gradeT *100
-        # qry = "INSERT INTO GradeBook(studentID, submissionID,grade) VALUES (%s,%s,%s);"
-        qry = "INSERT INTO GradeBook(studentID, submissionID,grade) VALUES (%s,%s,%s) " \
-              "ON DUPLICATE KEY UPDATE GradeBook.grade = %s;"
-        cursor.execute(qry, (sID, submissionID, gradePercent,gradePercent))
+            aID = assignmentID
+        qry = "INSERT INTO AssignmentGrade(assignmentID,studentID, assignmentGrade) VALUES (%s,%s,%s) " \
+              "ON DUPLICATE KEY UPDATE assignmentGrade = %s;"
+        cursor.execute(qry, (aID, sID, assignmentGrade,assignmentGrade))
+
+
+        cursor.execute("SELECT courseID FROM Assignment "
+                       "WHERE assignmentID = %s;" % aID)
+        for(courseID) in cursor:
+            cID = courseID[0]
+
+        finalGrade = update_finalgrade(cursor,cnx,cID,sID)
+        if finalGrade == False:
+            return False
         return True
-    except mysql.connector.Error:
+    except mysql.connector.Error as err:
+        print("Error in submit_SubmissionGrade")
+        print(err)
         return False
 
-def submit_Examgrade(cursor, studentID, examID, grade):
-    cursor.execute("SELECT gradeTotal FROM Exam WHERE examID = %s;" % examID)
-    for (gradeTotal) in cursor:
-        gradeT = gradeTotal[0]
-    gradePercent = float(grade) / gradeT * 100
-
-    qry = "INSERT INTO GradeBook(studentID, examID,grade) VALUES (%s,%s,%s) " \
-          "ON DUPLICATE KEY UPDATE GradeBook.grade = %s;"
+def submit_ExamGrade(cursor,cnx, studentID, examID, examGrade):
+    qry = "INSERT INTO ExamGrade(examID, studentID, examGrade) VALUES (%s,%s,%s) " \
+          "ON DUPLICATE KEY UPDATE examGrade = %s;"
     try:
-        cursor.execute(qry, (studentID, examID, gradePercent,gradePercent))
+        cursor.execute(qry, (examID, studentID, examGrade,examGrade))
+
+        cursor.execute("SELECT courseID FROM Exam "
+                       "WHERE examID = %s;" % examID)
+        for (courseID) in cursor:
+            cID = courseID[0]
+
+        finalGrade = update_finalgrade(cursor,cnx, cID, studentID)
+        if finalGrade == False:
+            return False
         return True
-    except mysql.connector.Error:
+    except mysql.connector.Error as err:
+        print("Error in submit_ExamGrade")
+        print(err)
         return False
 
 
-def update_grade(cursor, courseID, userID):
+def update_finalgrade(cursor,cnx, courseID, studentID):
+    # Get assignment grade
+    cursor.execute("SELECT assignmentGrade,gradeTotal "
+                   "FROM AssignmentGrade LEFT JOIN Assignment "
+                   "ON  AssignmentGrade.assignmentID = Assignment.assignmentID "
+                   "WHERE courseID = %s AND studentID = %s ;" %(courseID,studentID))
+    totalAssignmentGrade,assignmentPercentage = 0,30
+    for (assignmentGrade, gradeTotal) in cursor:
+        if assignmentGrade is not None:
+            totalAssignmentGrade += assignmentGrade/gradeTotal
 
-    cursor.execute("SELECT userType FROM Users WHERE ID = %s;" % userID)
-    for (userType) in cursor:
-        uType = userType[0]
+    cursor.execute("SELECT assignmentPercentage FROM Courses WHERE courseID = %s;" %courseID)
+    for (assignmentPercentage) in cursor:
+        assignmentPercentage = assignmentPercentage[0]
 
-    sIDs =[]
-    if uType == 1:  # Student
-        cursor.execute("SELECT studentID From TakenClasses WHERE courseID = %s;" %courseID)
-        for (studentID) in cursor:
-            sIDs.append(studentID[0])
+    #  Get exam grade
+    cursor.execute("SELECT examGrade,gradeTotal,examPercentage "
+                   "FROM  TakenClasses LEFT JOIN Exam "
+                   "ON TakenClasses.courseID = Exam.courseID "
+                   "LEFT JOIN ExamGrade ON Exam.examID = ExamGrade.examID "
+                   "AND ExamGrade.studentID = TakenClasses.studentID "
+                   "WHERE TakenClasses.courseID = %s "
+                   "AND TakenClasses.studentID = %s;" %(courseID,studentID))
 
-    elif uType == 0:
-        sIDs.append(userID[0])
+    totalExamGrade, totalExamPercentages = 0,0
+    for (examGrade,gradeTotal,examPercentage) in cursor:
+        if examGrade is not None:
+            totalExamGrade += examGrade/gradeTotal *examPercentage
+            totalExamPercentages += examPercentage
+
+    if totalAssignmentGrade == 0 and totalExamGrade == 0:
+        return None
+    elif totalAssignmentGrade == 0:
+        estFinalGrade = totalExamGrade/totalExamPercentages
+    elif totalExamGrade == 0:
+        estFinalGrade = totalAssignmentGrade
+    else:
+        estFinalGrade = (totalExamGrade+totalAssignmentGrade*assignmentPercentage)/(assignmentPercentage+examPercentage)
 
     try:
-        for studentID in sIDs:
-            cursor.execute("SELECT count(*),SUM(GradeBook.grade) FROM TakenClasses "
-                           "JOIN GradeBook ON TakenClasses.studentID = GradeBook.StudentID "
-                           "WHERE courseID = %s AND TakenClasses.studentID = %s "
-                           "AND submissionID is NOT NULL;" % (courseID, studentID))
-            assignmentGrade, examGrade = -1, -1
-            for (count, sumGrade) in cursor:
-                assignmentGrade = sumGrade / count
-
-            cursor.execute("SELECT count(*),SUM(GradeBook.grade) FROM TakenClasses "
-                           "JOIN GradeBook ON TakenClasses.studentID = GradeBook.StudentID "
-                           "WHERE courseID = %s AND TakenClasses.studentID = %s "
-                           "AND examID is NOT NULL;" % (courseID, studentID))
-
-            for (count, sumGrade) in cursor:
-                if sumGrade == None:
-                    examGrade = -1
-                else:
-                    examGrade = sumGrade / count
-
-            if examGrade == -1 and assignmentGrade == -1:
-                finalGrade = None
-            else:
-                if assignmentGrade == -1:
-                    assignmentGrade = examGrade
-                elif examGrade == -1:
-                    examGrade = assignmentGrade
-                finalGrade = assignmentGrade * 0.5 + examGrade * 0.5
-
-            cursor.execute("INSERT INTO TakenClasses (studentID, courseID, grade) VALUE (%s,%s,%s)"
-                           "ON DUPLICATE KEY UPDATE grade = %s;" % (studentID, courseID, finalGrade, finalGrade))
-        return True
-    except mysql.connector.Error:
+        cursor.execute("UPDATE TakenClasses SET estFinalGrade = %s "
+                       "WHERE studentID = %s AND courseID =%s;"%(estFinalGrade,studentID,courseID))
+        cnx.commit()
+        return estFinalGrade
+    except mysql.connector.Error as err:
+        print("Error in update_finalgrade")
+        print(err)
         return False
 
 
 
-# #################### Delete
+# Delete
 def del_Material(cursor,materialID):
     try:
-        cursor.execute("DELETE FROM ClassMaterials where materialID = %s;"% materialID)
+        cursor.execute("DELETE FROM ClassMaterial where materialID = %s;"% materialID)
         return True
     except mysql.connector.Error:
         return False
@@ -149,73 +199,16 @@ def del_Announcement(cursor,announcementID):
     except mysql.connector.Error:
         return False
 
-def del_Assignment(cursor,assignID):
+def del_Assignment(cursor,assignmentID):
     try:
-        cursor.execute("DELETE FROM Assignment where assignID = %s;"% assignID)
+        cursor.execute("DELETE FROM Assignment where assignmentID = %s;"% assignmentID)
         return True
     except mysql.connector.Error:
         return False
 
-
-
-################################
-# Below still need modify
-
-# def create_Submission(,studentID,assignID,file):
-#     isGraded = 0
-#     qry = "INSERT INTO AssignmentSubmission(studentID,assignID,isGraded,file) VALUES (%s,%s,%s,%s);"
-#     try:
-#         .cursor.execute(qry, (studentID,assignID,isGraded,file))
-#         .cnx.commit()  # Make sure data is committed to the database
-#         return "Upload Submission Success"
-#     except mysql.connector.Error as err:
-#         return "Upload Submission Failed"
-
-
-
-
-
-# def assign_grade(,studentID,submissionID,courseID,grade,description):
-#
-#
-#     try:
-#         if submissionID == 0:
-#             qry = "INSERT INTO GradeBook(studentID, assignID,description,grade) VALUES (%s,%s,%s,%s);"
-#             .cursor.execute(qry, (studentID, courseID, description, grade))
-#         else:
-#             qry = "INSERT INTO GradeBook(studentID,submissionID, assignID,description,grade) VALUES (%s,%s,%s,%s,%s);"
-#             .cursor.execute(qry, (studentID,courseID, submissionID,description,grade))
-#
-#             qry = "UPDATE AssignmentSubmission SET isGraded = 1 WHERE submissionID = %(submissionID)s;"
-#             .cursor.execute(qry,{'submissionID':submissionID})
-#
-#
-#         qry = "SELECT SUM(gradeTotal), SUM(grade) " \
-#               "FROM AssignmentSubmission JOIN Assignment " \
-#               "ON Assignment.AssignID = AssignmentSubmission.assignID AND coursesID = %s " \
-#               "JOIN GradeBook ON GradeBook.submissionID = AssignmentSubmission.submissionID " \
-#               "AND GradeBook.studentID = %s"
-#         # Get Assignment Grade
-#         .cursor.execute(qry, (courseID,studentID))
-#         for (gradeTotal, grade) in .cursor:
-#             totalGrade = gradeTotal
-#             currentGrade = grade
-#
-#         cursor.execute("SELECT grade FROM AssignmentSubmission WHERE submissionID is NULL;")
-#         for (grade) in .cursor:
-#             totalGrade += 100
-#             currentGrade += grade
-#
-#
-#         finalgrade = currentGrade/totalGrade * 100
-#         qry = "INSERT INTO TakenClasses (studentID,courseID,grade) VALUES (%s,%s,%s)" \
-#               "ON DUPLICATE KEY UPDATE grade = %s "
-#         .cursor.execute(qry, (studentID,courseID, finalgrade,finalgrade))
-#
-#         .cnx.commit()            # Make sure data is committed to the database
-#         return "Update Grade Success"
-#     except mysql.connector.Error as err:
-#         return "Update Grade Failed"
-#
-
-    #Update to final grade
+def del_Exam(cursor, examID):
+    try:
+        cursor.execute("DELETE FROM Exam where examID = %s;" % examID)
+        return True
+    except mysql.connector.Error:
+        return False
