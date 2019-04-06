@@ -23,7 +23,7 @@ def login():
 	if id_type != -1:
 		return jsonify(id_type), 200
 	else:
-		return jsonify(authorization=False, message="Wrong username or password"), 403
+		return jsonify(authorization=False, message="Wrong username or password"), 200
 
 
 # @app.route("/api/courses/<userID>", methods=['GET'])
@@ -280,7 +280,7 @@ def delMaterial(materialID):
 	return jsonify(update=boolean)
 
 @app.route('/api/deleteExam/<examID>', methods=['DELETE'])
-def delMaterial(examID):
+def delExam(examID):
 	# boolean value of update in DB or not
 	boolean = User.del_Exam(examID)
 	return jsonify(update=boolean)
