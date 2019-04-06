@@ -17,7 +17,7 @@ def query_courses(cursor):
 
 
 def query_takenClasses(cursor):
-    qry = ("SELECT studentID,courseID,grade FROM TakenClasses;")
+    qry = ("SELECT studentID,courseID,estFinalGrade FROM TakenClasses;")
     cursor.execute(qry)
     print("*" * 80)
     for (studentID,courseID,grade) in cursor:
@@ -25,23 +25,23 @@ def query_takenClasses(cursor):
     print("*" * 80)
 
 def query_assignment(cursor):
-    qry = ("SELECT assignID, courseID, deadline, postTime FROM Assignment;")
+    qry = ("SELECT assignmentID, courseID, deadline, postTime FROM Assignment;")
     cursor.execute(qry)
     print("*" * 80)
-    for (assignID, courseID, deadline, postTime) in cursor:
-        print(f"{assignID} : {courseID}, {deadline},   {postTime}")
+    for (assignmentID, courseID, deadline, postTime) in cursor:
+        print(f"{assignmentID} : {courseID}, {deadline},   {postTime}")
     print("*" * 80)
 
 def query_assignmentSubmission(cursor):
-    qry = ("SELECT submissionID, studentID, assignID, uploadTime FROM AssignmentSubmission;")
+    qry = ("SELECT submissionID, studentID, assignmentID, uploadTime FROM AssignmentSubmission;")
     cursor.execute(qry)
     print("*" * 80)
-    for (submissionID, studentID, assignID, uploadTime) in cursor:
-        print(f"{submissionID} : {studentID}, {assignID}, {uploadTime}")
+    for (submissionID, studentID, assignmentID, uploadTime) in cursor:
+        print(f"{submissionID} : {studentID}, {assignmentID}, {uploadTime}")
     print("*" * 80)
 
 def query_exam(cursor):
-    qry = ("SELECT examID, courseID, gradeTotal, description, examDay FROM Exam;")
+    qry = ("SELECT examID, courseID, gradeTotal, description, postTime FROM Exam;")
     cursor.execute(qry)
     print("*" * 80)
     for (examID, courseID, gradeTotal, description, examDay) in cursor:
@@ -52,13 +52,13 @@ def query_exam(cursor):
 
 
 
-def query_gradeBook(cursor):
-    qry = ("SELECT gradeID,studentID, submissionID, examID, grade, gradeTime FROM GradeBook;")
-    cursor.execute(qry)
-    print("*" * 80)
-    for (gradeID,studentID, submissionID, examID, grade, gradeTime) in cursor:
-        print(f"{gradeID} : {studentID}, {examID}, {submissionID}, {grade},{gradeTime}")
-    print("*" * 80)
+# def query_examGrade(cursor):
+#     qry = ("SELECT gradeID,studentID, submissionID, examID, grade, gradeTime FROM GradeBook;")
+#     cursor.execute(qry)
+#     print("*" * 80)
+#     for (gradeID,studentID, submissionID, examID, grade, gradeTime) in cursor:
+#         print(f"{gradeID} : {studentID}, {examID}, {submissionID}, {grade},{gradeTime}")
+#     print("*" * 80)
     # GradeBook(studentID, courseID, submissionID, description, grade)
 
 def query_classAnnouncement(cursor):
@@ -71,7 +71,7 @@ def query_classAnnouncement(cursor):
 
 
 def query_classMaterials(cursor):
-    qry = ("SELECT materialID,courseID,material, postTime FROM ClassMaterials;")
+    qry = ("SELECT materialID,courseID,material, postTime FROM ClassMaterial;")
     cursor.execute(qry)
     print("*" * 80)
     for (materialID,courseID,material, postTime) in cursor:
