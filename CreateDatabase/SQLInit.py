@@ -39,7 +39,7 @@ def init(cursor,database):
                    "task VARCHAR(256),"
                    "gradeTotal INTEGER,"
                    "postTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-                   "FOREIGN KEY (courseID) REFERENCES Courses(courseID));")
+                   "FOREIGN KEY (courseID) REFERENCES TakenClasses(courseID));")
 
     cursor.execute("CREATE TABLE AssignmentGrade("
                    "assignmentID INTEGER,"
