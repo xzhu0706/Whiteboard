@@ -26,7 +26,7 @@ class Card extends Component {
       if (this.props.isProf) { // for professor
         return (
           <div 
-            className="card" 
+            className="card smallcard" 
             onClick={(e) => this.props.onClick(e, this.props.id)}
             style = {{
               backgroundColor: this.props.bgColor, 
@@ -41,7 +41,10 @@ class Card extends Component {
             </div>
             <div className="card-body">
               <h5 className="card-text">{this.props.body}</h5>
-              <h6 className="card-text text-muted text-right">{this.props.time}</h6>
+              <div className="card-text text-muted d-flex justify-content-between">
+                <h6 className="">Grade Total: {this.props.gradeTotal}</h6>
+                <h6 className="">{this.props.time}</h6>
+              </div>
             </div>
           </div>
         );
@@ -54,6 +57,7 @@ class Card extends Component {
             note = 'Late';
           } else {
             bgColor = "#88ea8b"; //green
+            note = 'Submitted'
           }
         } else if (this.props.pastDue) {
           bgColor = "#ff7787";   //red
@@ -61,7 +65,7 @@ class Card extends Component {
         }
         return (
           <div 
-            className="card" 
+            className="card smallcard" 
             onClick={(e) => this.props.onClick(e, this.props.id)}
             style = {{
               backgroundColor: bgColor, 
@@ -78,32 +82,48 @@ class Card extends Component {
             </div>
             <div className="card-body">
               <h5 className="card-text">{this.props.body}</h5>
-              <h6 className="card-text text-muted text-right">{this.props.time}</h6>
+              <div className="card-text text-muted d-flex justify-content-between">
+                <h6 className="">Grade Total: {this.props.gradeTotal}</h6>
+                <h6 className="">{this.props.time}</h6>
+              </div>            
             </div>
           </div>
         );
       }
-    } else if (this.props.isSubmission) {
+    } else if (this.props.isSubmission) { // for submission page
       return (
         <div 
-          className="card" 
+          className="card smallcard" 
           style = {{
             backgroundColor: this.props.bgColor, 
             borderColor: this.props.borderColor,
           }}
         >
           <div className="header thumbnail d-flex justify-content-between">
-              <h4 style={{color: '#133263', fontWeight: 'bold', marginLeft: 20+'px'}}>{this.props.studentName}</h4>
-              <div>
-                <input 
-                  type="text" 
+            <h4 style={{color: '#133263', fontWeight: 'bold', marginLeft: 20+'px'}}>{this.props.studentName}</h4>
+            <form onSubmit={(e) => {this.props.handleGradeSubmission(e, this.props.id)}}>
+              <div className="form-group row">
+                <input
+                  name="grade"
+                  type="number"
+                  step="any" 
+                  min={0}
+                  max={this.props.gradeTotal}
+                  style={{marginTop: 5+'px'}}
                   className="form-control-sm" 
                   placeholder={this.props.grade}
                   onChange={this.handleInputChange}
+                  required
+                  //TODO: if have time, can make a message box for this field
+                /><p style={{marginTop: 10+'px'}}>/{this.props.gradeTotal}</p>
+                <Button 
+                  color="danger" 
+                  style={{marginRight: 20+'px', marginLeft: 5+'px', marginBottom: 5+'px'}}
                 >
-                </input>
-                <Button color="danger" onClick={(e) => {this.props.handleGradeSubmission(e, this.props.id, this.state.inputGrade)}}>Enter</Button>
+                  Enter
+                </Button>
               </div>
+            </form>
           </div>
           <div className="card-body">
             <textarea disabled 
@@ -122,7 +142,7 @@ class Card extends Component {
     } else {
       return (
         <div 
-          className="card" 
+          className="card smallcard" 
           onClick={(e) => this.props.onClick(e, this.props.id)}
           style = {{
             backgroundColor: this.props.bgColor, 

@@ -36,6 +36,7 @@ class Assignments extends Component {
 						isSubmitted={assignment.isSubmitted}
 						isLate={assignment.isLate}
 						pastDue={assignment.pastDue}
+						gradeTotal={assignment.gradeTotal}
 						title={assignment.title}
 						body={assignment.task}
 						time={"Deadline: " + assignment.deadline}
@@ -69,7 +70,7 @@ class Assignments extends Component {
 							body={assignment.task}
 							time={"Deadline: " + assignment.deadline}
 							onClick={this.handleOnClickAssignment}
-							bgColor={assignmentID === assignment.assignmentID ? '#b0e5f4' : '' }
+							bgColor={assignmentID === assignment.assignmentID ? '#eae4c5' : '' }
 							handleSeeSubmissions={this.handleSeeSubmissions}
 						/>
 					);

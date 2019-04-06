@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import Card from './Card.js';
 import { Button } from 'reactstrap';
-// import SingleInputFieldModal from './modals/SingleFieldModal.js';
-import cookie from 'react-cookies';
 
 class Submissions extends Component {
   constructor(props) {
@@ -12,7 +10,6 @@ class Submissions extends Component {
 			selectedSubmission: '',
 		};
 		
-		// this.handleOnClickSubmission = this.handleOnClickSubmission.bind(this);
 		this.handleDownloadSubmission = this.handleDownloadSubmission.bind(this);
 		this.handleGradeSubmission = this.handleGradeSubmission.bind(this);
 	}
@@ -30,6 +27,7 @@ class Submissions extends Component {
 						isSubmitted={submission.isSubmitted}
 						// isGraded={submission.isGraded}
 						grade={submission.grade}
+						gradeTotal={submission.gradeTotal}
 						body={submission.content}
 						time={'Submitted at ' + submission.submitTime}
 						// onClick={this.handleOnClickSubmission}
@@ -69,14 +67,14 @@ class Submissions extends Component {
 	// 	}
 	// }
 
-	handleGradeSubmission(e, submissionID, grade) {
+	handleGradeSubmission(e, submissionID) {
 		//TODO
 		e.preventDefault();
-		console.log('enter grade for', submissionID, grade);
-		if (grade >= 0) {
+		console.log('enter grade for', submissionID);
+		if (e.target.grade.value >= 0) {
 			const data = {
 				submissionID: submissionID,
-				grade: grade
+				grade: e.target.grade.value,
 			}
 			console.log('data', data);
 			fetch('http://localhost:5000/api/gradeSubmission', {
@@ -109,58 +107,20 @@ class Submissions extends Component {
 	}
 
   render() {
-		//TODO
-		if (this.props.isProf) {
-			return (
-				<div className="card submission-section">
+		return (
+			<div className="card submission-section">
 
-					<div className="header thumbnail">
-						Submissions
-					</div>
-
-					<div className="card-body">
-						{this.state.submissions}
-					</div>
-
-					<div className="card-footer">
-						<Button 
-							className="other-button"
-							color="success"
-							onClick={this.handleDownloadSubmission}
-						>
-							Download
-						</Button>
-						<Button 
-							className="other-button"
-							color="info"
-							onClick={this.toggleCreateSubmissionModal}
-						>
-							Create
-						</Button>
-						<Button 
-							className="other-button"
-							color="warning"
-							onClick={this.handleDeleteSubmission}
-						>
-							Delete
-						</Button>
-					</div>
-
+				<div className="header thumbnail">
+					Submissions
 				</div>
-			);
-		} else {
-			return (
-				<div className="card submission-section">
-					<div className="header thumbnail">
-						Class Submissions
-					</div>
-					<div className="card-body">
-						{this.state.submissions}
-					</div>
+
+				<div className="card-body">
+					{this.state.submissions}
 				</div>
-			);
-		}
-  }
+				
+			</div>
+		);
+	}
 };
 
 export default Submissions;

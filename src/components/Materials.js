@@ -51,8 +51,7 @@ class Materials extends Component {
 				return (
 					<Card 
 						id={material.materialID}
-						bgColor={materialID === material.materialID ? '#ea8383' : '' }
-						borderColor={materialID === material.materialID ? 'red' : ''}
+						bgColor={materialID === material.materialID ? '#eae4c5' : '' }
 						body={material.material}
 						time={"posted at " + material.postTime}
 						onClick={this.handleOnClickMaterial}
