@@ -8,15 +8,53 @@ class GradeBook extends Component {
   constructor(props) {
     super(props);
     this.state = {
-			grades: [],
+			assignments: [],
+			exams: [],
+			estFinalGrade: null,
 		};
 		
 	}
 
 	componentDidMount() {
-		//TODO
 		console.log('props for GradeBook component', this.props);
-
+		if (!this.props.isProf) { // for student
+			if (this.props.gradeBook.assignment.length > 0) {
+				const assignments = this.props.gradeBook.assignment.map((assignment) => {
+					return (
+						<Card 
+							id={assignment.assignmentID}
+							isGrade={true}
+							grade={assignment.assignmentGrade}
+							gradeTotal={assignment.gradeTotal}
+							type='assignment'
+							title={assignment.assignmentTitle}
+						/>
+					);
+				});
+				this.setState({ assignments });
+			}
+			if (this.props.gradeBook.exam.length > 0) {
+				const exams = this.props.gradeBook.exam.map((exam) => {
+					return (
+						<Card 
+							id={exam.examID}
+							isGrade={true}
+							grade={exam.examGrade}
+							gradeTotal={exam.gradeTotal}
+							type='exam'
+							percentage={exam.examPercentage}
+							title={exam.examTitle}
+						/>
+					);
+				});
+				this.setState({ exams });
+			}
+			this.setState({
+				estFinalGrade: this.props.gradeBook.finalGrade
+			})
+		} else { // for professor
+			//TODO
+		}
 	}
 
   render() {
@@ -51,9 +89,35 @@ class GradeBook extends Component {
 					<div className="header thumbnail">
 						My Grades
 					</div>
-					<div className="card-body">
-						{this.state.grades}
+
+					<div className="card">
+						<div className="card-body">
+							<Card 
+								// id={}
+								isGrade={true}
+								grade={this.state.estFinalGrade}
+								gradeTotal={100}
+								type='final'
+								title="Estimated Final Grade"
+								borderColor="red"
+							/>
+						</div>
 					</div>
+
+					<div className="card">
+						<div className="card-body">
+							<h5>Exams</h5>
+							{this.state.exams}
+						</div>
+					</div>
+
+					<div className="card">
+						<div className="card-body">
+							<h5>Assignments</h5>
+							{this.state.assignments}
+						</div>
+					</div>
+
 				</div>
 			);
 		}

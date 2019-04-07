@@ -44,7 +44,7 @@ class GradeBookPage extends Component {
 						console.log(res);
 						const gradeBook = (
 							<GradeBook 
-								gradeBook={res.data}
+								gradeBook={res.data[0]}
 								// assignmentID={this.state.assignmentID} 
 								isProf={this.state.userType === "1"}
 							/>

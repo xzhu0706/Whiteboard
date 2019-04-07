@@ -139,7 +139,27 @@ class Card extends Component {
           </div>
         </div>
       );
-    } else {
+    } else if (this.props.isGrade) {
+      return (
+        <div
+          className="card smallcard"
+          style = {{
+            backgroundColor: this.props.bgColor, 
+            borderColor: this.props.borderColor,
+          }}
+        >
+          <div className="card-body card-text d-flex justify-content-between">
+            <div className="">
+              {this.props.title}
+            </div>
+            <div className="">
+              {this.props.grade ? this.props.grade : '-'}/{this.props.gradeTotal}
+            </div>
+          </div>
+        </div>
+      )
+    }
+    else {
       return (
         <div 
           className="card smallcard" 
