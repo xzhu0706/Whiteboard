@@ -140,10 +140,14 @@ def update_finalgrade(cursor,cnx, courseID, studentID):
                    "ON  AssignmentGrade.assignmentID = Assignment.assignmentID "
                    "WHERE courseID = %s AND studentID = %s ;" %(courseID,studentID))
     totalAssignmentGrade,assignmentPercentage = 0,30
+    i = 0
     for (assignmentGrade, gradeTotal) in cursor:
         if assignmentGrade is not None:
             totalAssignmentGrade += assignmentGrade/gradeTotal
+            i+=1
 
+    if i != 0:
+        totalAssignmentGrade /= i
     cursor.execute("SELECT assignmentPercentage FROM Courses WHERE courseID = %s;" %courseID)
     for (assignmentPercentage) in cursor:
         assignmentPercentage = assignmentPercentage[0]
@@ -166,11 +170,11 @@ def update_finalgrade(cursor,cnx, courseID, studentID):
     if totalAssignmentGrade == 0 and totalExamGrade == 0:
         return None
     elif totalAssignmentGrade == 0:
-        estFinalGrade = totalExamGrade/totalExamPercentages
+        estFinalGrade = totalExamGrade/totalExamPercentages *100
     elif totalExamGrade == 0:
-        estFinalGrade = totalAssignmentGrade
+        estFinalGrade = totalAssignmentGrade *100
     else:
-        estFinalGrade = (totalExamGrade+totalAssignmentGrade*assignmentPercentage)/(assignmentPercentage+examPercentage)
+        estFinalGrade = (totalExamGrade+totalAssignmentGrade*assignmentPercentage)/(assignmentPercentage+totalExamPercentages)*100
 
     try:
         cursor.execute("UPDATE TakenClasses SET estFinalGrade = %s "
