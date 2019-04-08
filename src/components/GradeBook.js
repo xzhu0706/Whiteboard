@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import Card from './Card.js';
 import { Button } from 'reactstrap';
-// import SingleInputFieldModal from './modals/SingleFieldModal.js';
-import cookie from 'react-cookies';
+import GradeBookTable from './GradeBookTable.js';
+import createExamModal from './modals/CreateExamModal.js';
+import CreateExamModal from './modals/CreateExamModal.js';
+
 
 class GradeBook extends Component {
   constructor(props) {
@@ -11,8 +13,12 @@ class GradeBook extends Component {
 			assignments: [],
 			exams: [],
 			estFinalGrade: null,
+			gradeBookTable: null,
+			createExamModal: false,
 		};
-		
+
+		this.toggleCreateExamModal = this.toggleCreateExamModal.bind(this);
+		this.handleCreateExam = this.handleCreateExam.bind(this);
 	}
 
 	componentDidMount() {
@@ -52,9 +58,48 @@ class GradeBook extends Component {
 			this.setState({
 				estFinalGrade: this.props.gradeBook.finalGrade
 			})
-		} else { // for professor
-			//TODO
+		} 
+	}
+
+	toggleCreateExamModal(e) {
+		this.setState({
+			createExamModal: !this.state.createExamModal
+		});
+	}
+
+	handleCreateExam(event) {
+		//backend TODO: sort the exams by id
+		// event.preventDefault();
+
+		const data = {
+			courseID: this.props.courseID,
+			examTitle: event.target.title.value,
+			examPercentage: event.target.percentage.value, 
+			gradeTotal: event.target.gradeTotal.value, 
 		}
+		 console.log(data);
+
+		fetch('http://localhost:5000/api/createExam', {
+			method: 'POST',
+			headers: {'Content-Type':'application/json'},
+			body: JSON.stringify(data)
+		}).then((res) => {
+
+			console.log(res)
+			if(res.ok) {
+				res.json().then(data => ({
+					data: data,
+					status: res.status
+				})).then(res => {
+					console.log(res);
+				});
+			}
+			else{
+				// window.location.replace("/error");
+				console.log('error while creating exam')
+			}
+
+		});
 	}
 
   render() {
@@ -62,13 +107,20 @@ class GradeBook extends Component {
 		if (this.props.isProf) {
 			return (
 				<div className="card gradebook-section">
+					<CreateExamModal 
+						isOpen={this.state.createExamModal}
+						toggle={this.toggleCreateExamModal}
+						handleSubmit={this.handleCreateExam}
+						header="New Exam"
+					/>
 
 					<div className="header thumbnail">
 						Grade Book
 					</div>
 
 					<div className="card-body">
-						{this.state.grades}
+						{/* {this.state.grades} */}
+						<GradeBookTable data={this.props.gradeBook} />
 					</div>
 
 					<div className="card-footer">

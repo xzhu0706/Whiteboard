@@ -11,7 +11,7 @@ class GradeBookPage extends Component {
 		this.state = {
 			userID: 0,
 			userType: 3,
-			gradeBook: [],
+			gradeBook: null,
 			courseInfo: {
 				courseID: 0,
 				professorID: 0,
@@ -44,7 +44,8 @@ class GradeBookPage extends Component {
 						console.log(res);
 						const gradeBook = (
 							<GradeBook 
-								gradeBook={res.data[0]}
+								gradeBook={res.data}
+								courseID={courseID}
 								// assignmentID={this.state.assignmentID} 
 								isProf={this.state.userType === "1"}
 							/>
@@ -67,11 +68,11 @@ class GradeBookPage extends Component {
 
 				<div className="row">
 
-					<div className="col-sm-4 d-flex justify-content-end">
+					<div className="col-sm-3 d-flex justify-content-end">
 						<SideBar />
 					</div>
 
-					<div className="col-sm-8">
+					<div className="col-sm-9">
 						{this.state.gradeBook}
 					</div>
 

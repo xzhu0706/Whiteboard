@@ -52,7 +52,7 @@ class Assignments extends Component {
 	}
 	
 	handleOnClickAssignment(e, assignmentID) {
-		if (cookie.load('userType') == 1) {
+		// if (cookie.load('userType') == 1) {
 			console.log(assignmentID);
 			this.setState({
 				selectedAssignment: assignmentID
@@ -66,18 +66,21 @@ class Assignments extends Component {
 							isProf={this.props.isProf}
 							isAssignment={true}
 							pastDue={assignment.pastDue}
+							gradeTotal={assignment.gradeTotal}
 							title={assignment.title}
 							body={assignment.task}
 							time={"Deadline: " + assignment.deadline}
 							onClick={this.handleOnClickAssignment}
+							handleSubmitAssign={this.toggleSubmitAssignmentModal}
 							bgColor={assignmentID === assignment.assignmentID ? '#eae4c5' : '' }
 							handleSeeSubmissions={this.handleSeeSubmissions}
+							handleDownload={this.handleDownloadAssignment}
 						/>
 					);
 				})
 				this.setState({ assignments });
 			}
-		}
+		// }
 	}
 
 	handleDeleteAssignment(e) {
@@ -104,15 +107,14 @@ class Assignments extends Component {
 		}	}
 
 	handleCreateAssignment(event) {
-		event.preventDefault();
-		// TODO*****************************************************
+		// event.preventDefault();
 
 		const data = {
 			courseID: this.props.courseID,
 			title: event.target.title.value,
 			task: event.target.task.value,
-			deadline: event.target.deadline.value, //need to let user choose the day
-			gradeTotal: event.target.gradeTotal.value, //need to let user input the grade
+			deadline: event.target.deadline.value, 
+			gradeTotal: event.target.gradeTotal.value, 
 		}
 		 console.log(data);
 
@@ -142,7 +144,7 @@ class Assignments extends Component {
 	handleSubmitAssignment(e, submittedAssignment) {
 		console.log('submit assignment for', this.state.selectedAssignment);
 		const data = {
-			assignID: this.state.selectedAssignment,
+			assignmentID: this.state.selectedAssignment,
 			studentID: cookie.load('userID'),
 			content: submittedAssignment
 		}
@@ -221,7 +223,7 @@ class Assignments extends Component {
 						<Button 
 							className="other-button"
 							color="success"
-							onClick={this.handleDownloadAssignment}
+							onClick={(e) => {this.handleDownloadAssignment(e, this.state.selectedAssignment)}}
 						>
 							Download
 						</Button>
