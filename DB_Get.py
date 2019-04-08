@@ -236,7 +236,7 @@ def get_grades(cursor, cnx, courseID,userID):
         if finalGrade == False:
             return -1
         else:
-            studentGrade["final"] = finalGrade
+            studentGrade["final"] = round(finalGrade,2)
         gradeDict['data'].append(studentGrade)
 
     if not gradeDict:
