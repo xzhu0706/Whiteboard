@@ -183,12 +183,17 @@ def get_grades(cursor, cnx, courseID,userID):
         for (studentID) in cursor:
             sIDs.append(studentID[0])
 
-    gradeDict = []
+
+
+    cursor.execute("SELECT assignmentPercentage FROM Courses WHERE courseID = %s;" % courseID)
+    for (assignmentPercentage) in cursor:
+        assignmentPercentage = assignmentPercentage[0]
+    gradeDict ={"percentage":{},"gradeTotal":{}, "title":{},"data":[]}
+    gradeDict["percentage"]["assignmentPercentage"] = assignmentPercentage
+
+    get = True
     for studentID in sIDs:
         # get assignment grade
-        cursor.execute("SELECT assignmentPercentage FROM Courses WHERE courseID = %s;" % courseID)
-        for (assignmentPercentage) in cursor:
-            assignmentPercentage = assignmentPercentage[0]
 
         cursor.execute("SELECT AssignmentGrade.assignmentID, assignmentGrade,gradeTotal,"
                        "deadline,title, firstName,lastName "
@@ -198,13 +203,17 @@ def get_grades(cursor, cnx, courseID,userID):
                        "WHERE courseID = %s AND studentID = %s "
                        "ORDER BY AssignmentGrade.assignmentID;"%(courseID,studentID))
 
-        studentGrade = {"studentID": studentID, "name":"",
-                        "assignment":[], "assignmentPercentage":assignmentPercentage,
-                        "exam":[], "finalGrade":0}
+        studentGrade = {"ID": studentID, "name":"", "final":0}
+
         for (assignmentID, assignmentGrade, gradeTotal, deadline,title, firstName, lastName) in cursor:
             studentGrade["name"] = firstName + " " + lastName
-            studentGrade["assignment"].append({"assignmentID":assignmentID, "assignmentTitle":title,
-                                            "assignmentGrade":assignmentGrade, "gradeTotal": gradeTotal})
+            assignmentName = "as"+str(assignmentID)
+
+            studentGrade[assignmentName]= assignmentGrade
+
+            if get:
+                gradeDict["gradeTotal"][assignmentName] = gradeTotal
+                gradeDict["title"][assignmentName] = title
 
         #  Get exam grade
         cursor.execute("SELECT Exam.examID, examGrade,gradeTotal,examPercentage,description "
@@ -216,17 +225,19 @@ def get_grades(cursor, cnx, courseID,userID):
                        "AND TakenClasses.studentID = %s "
                        "ORDER BY Exam.examID;" % (courseID, studentID))
         for(examID,examGrade,gradeTotal,examPercentage,description) in cursor:
-            studentGrade["exam"].append({"examID": examID, "examTitle": description,
-                                      "examGrade": examGrade, "examPercentage":examPercentage,
-                                      "gradeTotal":gradeTotal
-            })
+            examName = "ex"+str(examID)
+            studentGrade[examName] = examGrade
+            if get:
+                gradeDict["gradeTotal"][examName] = gradeTotal
+                gradeDict["title"][examName] = description
+                gradeDict["percentage"][examName] = examPercentage
 
         finalGrade = update_finalgrade(cursor,cnx, courseID,studentID)
         if finalGrade == False:
             return -1
         else:
-            studentGrade["finalGrade"]:finalGrade
-        gradeDict.append(studentGrade)
+            studentGrade["final"] = finalGrade
+        gradeDict['data'].append(studentGrade)
 
     if not gradeDict:
         return -1
