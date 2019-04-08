@@ -68,8 +68,9 @@ def submit_Assignment(cursor,assignmentID,studentID,content):
 
 def submit_AssignmentGrade(cursor,cnx, assignmentID, studentID, assignmentGrade):
     try:
-        qry = "INSERT INTO AssignmentGrade(assignmentID,studentID, assignmentGrade) VALUE (%s,%s,%s)"
-        cursor.execute(qry, (assignmentID, studentID, assignmentGrade))
+        qry = "INSERT INTO AssignmentGrade(assignmentID,studentID, assignmentGrade) VALUE (%s,%s,%s)" \
+              "ON DUPLICATE KEY UPDATE AssignmentGrade = %s;"
+        cursor.execute(qry, (assignmentID, studentID, assignmentGrade, assignmentGrade))
 
         cursor.execute("SELECT courseID FROM Assignment "
                        "WHERE assignmentID = %s;" % assignmentID)
