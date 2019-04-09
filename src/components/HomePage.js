@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import cookie from 'react-cookies';
+import {Jumbotron, Container, Row, Col} from 'reactstrap';
 
 class HomePage extends Component {
 	constructor(props) {
@@ -34,6 +35,7 @@ class HomePage extends Component {
 							return (
 								<h2 
 									onClick={(e) => {window.location = '/course/' + course.courseID}} 
+									style={{cursor: 'pointer'}}
 									key={course.courseID} 
 									// className="" for styling later
 								>
@@ -54,10 +56,18 @@ class HomePage extends Component {
 	render() {
 		return (
 			<div>
-				<h1>Welcome to your home page, {this.state.firstName} {this.state.lastName}!</h1>
-				
-				{this.state.courses.length === 0 ? (<h5>No courses found</h5>) : this.state.courses }
-
+				<Jumbotron fluid style={{height: '280px', backgroundColor: '#eae4c5'}}>
+					<Container>
+							<h1 className="course-name" style={{fontWeight: 'bold'}}> 
+								Welcome to your home page, {this.state.firstName} {this.state.lastName}!
+							</h1>
+					</Container>
+        </Jumbotron>
+				<div className="text-center" >
+     			<text style = {{fontSize:40, color: '#1a0dab', textDecorationLine: 'underline',}}>
+      			{this.state.courses.length === 0 ? (<text style ={{fontSize: 35}}>No Courses Found</text>) : this.state.courses }
+     			</text>
+				</div>
 			</div>
 		);
 	}

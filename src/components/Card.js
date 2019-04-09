@@ -73,7 +73,7 @@ class Card extends Component {
             }}
           >
             <div className="header thumbnail d-flex justify-content-between">
-              <Button color={this.props.isSubmitted ? "secondary" : "info"} onClick={!this.props.isSubmitted ? this.props.handleSubmitAssign : (e) => {}}>Submit</Button>
+              <Button color={this.props.isSubmitted ? "secondary" : "info"} onClick={!this.props.isSubmitted ? this.props.handleSubmitAssign : (e) => {alert('Cannot submit more than once!'); window.location.reload();}}>Submit</Button>
               <h5 style={{color: 'red', fontWeight: 'bold'}}>{note}</h5>
               <Button color="secondary" onClick={(e) => {this.props.handleDownload(e, this.props.id)}}>Download</Button>
             </div>
@@ -91,15 +91,29 @@ class Card extends Component {
         );
       }
     } else if (this.props.isSubmission) { // for submission page
+      let bgColor = '';
+      let note = '';
+        if (this.props.isSubmitted) {
+          if (this.props.isLate) {
+            bgColor = "#edf464"; //yellow
+            note = 'Late';
+          } else {
+            bgColor = "#88ea8b"; //green
+            note = 'Submitted'
+          }
+        } else if (this.props.pastDue) {
+          bgColor = "#ff7787";   //red
+          note = 'Past Due'
+        }
       return (
         <div 
           className="card smallcard" 
           style = {{
-            backgroundColor: this.props.bgColor, 
+            backgroundColor: bgColor, 
             borderColor: this.props.borderColor,
           }}
         >
-          <div className="header thumbnail d-flex justify-content-between">
+          <div className="d-flex justify-content-between">
             <h4 style={{color: '#133263', fontWeight: 'bold', marginLeft: 20+'px'}}>{this.props.studentName}</h4>
             <form onSubmit={(e) => {this.props.handleGradeSubmission(e, this.props.id)}}>
               <div className="form-group row">
@@ -126,6 +140,7 @@ class Card extends Component {
             </form>
           </div>
           <div className="card-body">
+            {note}
             <textarea disabled 
               className="form-control"
               style={{height: 100+'px'}}
@@ -133,8 +148,8 @@ class Card extends Component {
               {this.props.body}
             </textarea>
             <div className="d-flex justify-content-between">
-              <h6 className="card-text text-muted text-left">{this.props.time === null ? this.props.time : ''}</h6>
-              <Button>Download</Button>
+              <h6 className="card-text text-muted text-left">{this.props.time == null ? '' : 'Submitted at ' + this.props.time}</h6>
+              <Button onClick={(e) => {this.props.handleDownload(e, this.props.id)}}>Download</Button>
             </div>
           </div>
         </div>

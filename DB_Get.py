@@ -144,7 +144,7 @@ def get_submission(cursor, assignmentID):
         if submissionID is not None:
             isSubmitted = True
             upTime = uploadTime.strftime("%m/%d/%Y, %H:%M:%S")
-            if deadline > uploadTime:
+            if deadline < uploadTime:
                 isLate = True
             if assignmentGrade is not None:
                 isGrade = True
@@ -188,7 +188,7 @@ def get_grades(cursor, cnx, courseID,userID):
                        "ON AssignmentGrade.assignmentID = Assignment.assignmentID "
                        "LEFT JOIN Users ON AssignmentGrade.studentID = Users.ID "
                        "WHERE courseID = %s AND studentID = %s "
-                       "ORDER BY AssignmentGrade.assignmentID;" % (courseID, userID))
+                       "ORDER BY AssignmentGrade.assignmentID DESC;" % (courseID, userID))
         gradeDict = {"studentID": userID, "name": "",
                         "assignment": [], "assignmentPercentage": assignmentPercentage,
                         "exam": [], "finalGrade": 0}
@@ -204,7 +204,7 @@ def get_grades(cursor, cnx, courseID,userID):
                        "AND ExamGrade.studentID = TakenClasses.studentID "
                        "WHERE TakenClasses.courseID = %s "
                        "AND TakenClasses.studentID = %s "
-                       "ORDER BY Exam.examID;" % (courseID, userID))
+                       "ORDER BY Exam.examID DESC;" % (courseID, userID))
         for (examID, examGrade, gradeTotal, examPercentage, description) in cursor:
             gradeDict["exam"].append({"examID": examID, "examTitle": description,
                                          "examGrade": examGrade, "examPercentage": examPercentage,
@@ -244,13 +244,16 @@ def get_grades(cursor, cnx, courseID,userID):
                            "ON AssignmentGrade.assignmentID = Assignment.assignmentID "
                            "LEFT JOIN Users ON AssignmentGrade.studentID = Users.ID "
                            "WHERE courseID = %s AND studentID = %s "
-                           "ORDER BY AssignmentGrade.assignmentID;"%(courseID,studentID))
+                           "ORDER BY AssignmentGrade.assignmentID ASC;"%(courseID,studentID))
 
             studentGrade = {"ID": studentID, "name":"", "final":0.0}
 
             for (assignmentID, assignmentGrade, gradeTotal, deadline,title, firstName, lastName) in cursor:
                 studentGrade["name"] = firstName + " " + lastName
-                assignmentName = "as"+str(assignmentID)
+                if assignmentID < 10:
+                    assignmentName = "as0"+str(assignmentID)
+                else: 
+                    assignmentName = "as"+str(assignmentID)
 
                 studentGrade[assignmentName]= assignmentGrade
 
@@ -266,9 +269,13 @@ def get_grades(cursor, cnx, courseID,userID):
                            "AND ExamGrade.studentID = TakenClasses.studentID "
                            "WHERE TakenClasses.courseID = %s "
                            "AND TakenClasses.studentID = %s "
-                           "ORDER BY Exam.examID;" % (courseID, studentID))
+                           "ORDER BY Exam.examID ASC;" % (courseID, studentID))
             for(examID,examGrade,gradeTotal,examPercentage,description) in cursor:
-                examName = "ex"+str(examID)
+                if examID < 10:
+                    examName = "ex0"+str(examID)
+                else:
+                    examName = "ex"+str(examID)
+
                 studentGrade[examName] = examGrade
                 if get:
                     gradeDict["gradeTotal"][examName] = gradeTotal

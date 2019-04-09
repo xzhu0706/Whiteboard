@@ -177,6 +177,8 @@ class Assignments extends Component {
 
 	handleDownloadAssignment(e, assignmentID) {
 		console.log('download assignment', assignmentID);
+		alert('Download feature is currently not avialable.');
+		window.location.reload()
 		//TODO: if we implement uploading&downloading files 
 	}
 
@@ -207,13 +209,6 @@ class Assignments extends Component {
 					</div>
 
 					<div className="card-footer">
-						{/* for create, delete buttons */}
-						{/* <SingleInputFieldModal
-							isOpen={this.state.createAssignmentModal}
-							toggle={this.toggleCreateAssignmentModal}
-							handleSubmit={this.handleCreateAssignment}
-							header="New Assignment"
-						/> */}
 						<CreateAssignmentModal
 							isOpen={this.state.createAssignmentModal}
 							toggle={this.toggleCreateAssignmentModal}

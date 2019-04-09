@@ -50,6 +50,7 @@ class LoginPage extends Component {
 				});
 			} else {
 				console.log('error while fetching');
+				alert('Wrong username or password.');
 			}
 		});
 		event.preventDefault();

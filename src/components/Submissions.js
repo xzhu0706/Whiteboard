@@ -24,13 +24,16 @@ class Submissions extends Component {
 						studentName={submission.studentName}
 						isSubmission={true}
 						isSubmitted={submission.isSubmitted}
+						isLate={submission.isLate}
+						pastDue={submission.pastDue}
 						// isGraded={submission.isGraded}
 						grade={submission.assignmentGrade}
 						gradeTotal={submission.gradeTotal}
 						body={submission.content}
-						time={'Submitted at ' + submission.submitTime}
+						time={submission.submitTime}
 						// onClick={this.handleOnClickSubmission}
 						handleGradeSubmission={this.handleGradeSubmission}
+						handleDownload={this.handleDownloadSubmission}
 					/>
 				);
 			})
@@ -100,8 +103,10 @@ class Submissions extends Component {
 		}
 	}
 
-	handleDownloadSubmission(e) {
-		console.log('download submission', this.state.selectedSubmission);
+	handleDownloadSubmission(e, submissionID) {
+		console.log('download submission', submissionID);
+		alert('Download feature is currently not avialable.');
+		window.location.reload()
 		//TODO: if we implement uploading&downloading files 
 	}
 

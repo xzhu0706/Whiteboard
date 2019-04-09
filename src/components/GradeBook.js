@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Card from './Card.js';
 import { Button } from 'reactstrap';
 import GradeBookTable from './GradeBookTable.js';
-import createExamModal from './modals/CreateExamModal.js';
 import CreateExamModal from './modals/CreateExamModal.js';
 
 

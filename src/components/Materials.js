@@ -118,6 +118,8 @@ class Materials extends Component {
 
 	handleDownloadMaterial(e) {
 		console.log('download material', this.state.selectedMaterial);
+		alert('Download feature is currently not avialable.');
+		window.location.reload()
 		//TODO: if we implement uploading&downloading files 
 	}
 
