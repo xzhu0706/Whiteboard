@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import cookie from 'react-cookies';
 import { Button } from 'reactstrap';
+import { Card } from 'reactstrap';
 
 class SideBar extends Component {
 	constructor(props) {

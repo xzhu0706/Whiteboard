@@ -9,8 +9,8 @@ from SQLCreate import *
 from SQLQuery import *
 
 config = {
-    "user": '',    # your mysql username
-    "password": '',  # your mysql password
+    "user": 'root',    # your mysql username
+    "password": 'password',  # your mysql password
     "host": '127.0.0.1',
 }
 # Set your own database name

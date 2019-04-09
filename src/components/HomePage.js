@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import cookie from 'react-cookies';
+import { Button } from 'reactstrap';
+import '../styling/HomePage.css';
 
 class HomePage extends Component {
 	constructor(props) {
@@ -32,6 +34,15 @@ class HomePage extends Component {
 
 						const courses = res.data.map((course) => {
 							return (
+								<div className="courses_nagivator">
+									<Button onClick={(e) => {window.location = '/course/' + course.courseID}}
+									key = {course.courseID}
+									color="primary"
+									>
+									{course.courseName} {course.semester} {course.year}
+									</Button>
+								</div>
+								/*
 								<h2 
 									onClick={(e) => {window.location = '/course/' + course.courseID}} 
 									key={course.courseID} 
@@ -39,6 +50,7 @@ class HomePage extends Component {
 								>
 									{course.courseName} {course.semester} {course.year} 
 								</h2>
+								*/
 							)
 						})
 						this.setState({ courses });

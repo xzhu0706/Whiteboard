@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import cookie from 'react-cookies';
-
+import '../styling/LoginPage.css';
 class LoginPage extends Component {
 	constructor(props) {
 		super(props);
@@ -57,35 +57,37 @@ class LoginPage extends Component {
 
 	render() {
 		return (
-			<div className="row">
-				<div className="col-4"></div>
-				<form className="form-signin col-4" onSubmit={this.handleSubmit}>       
-					<h2 className="form-signin-heading">Please login</h2>
-					<input 
-						type="text" 
-						className="form-control" 
-						name="username" 
-						placeholder="Username" 
-						required="" 
-						autofocus=""
-						onChange={(e) => { this.setState({ username: e.target.value})}}
-					/>
-					<input 
-						type="password" 
-						className="form-control" 
-						name="password" 
-						placeholder="Password" 
-						required=""
-						onChange={(e) => { this.setState({ password: e.target.value})}}
-					/>      
-					<button 
-						className="btn btn-lg btn-primary btn-block" 
-						type="submit"
-					>
-						Login
-					</button>   
-				</form>
-				<div className="col-4"></div>
+			<div className="login-page-container">
+				<div className="row">
+					<div className="col-4"></div>
+					<form className="form-signin col-4" onSubmit={this.handleSubmit}>       
+						<h2 className="form-signin-heading">Please login</h2>
+						<input 
+							type="text" 
+							className="form-control" 
+							name="username" 
+							placeholder="Username" 
+							required="" 
+							autofocus=""
+							onChange={(e) => { this.setState({ username: e.target.value})}}
+						/>
+						<input 
+							type="password" 
+							className="form-control" 
+							name="password" 
+							placeholder="Password" 
+							required=""
+							onChange={(e) => { this.setState({ password: e.target.value})}}
+						/>      
+						<button 
+							className="btn btn-lg btn-primary btn-block" 
+							type="submit"
+						>
+							Login
+						</button>   
+					</form>
+					<div className="col-4"></div>
+				</div>
 			</div>
 		);
 	}

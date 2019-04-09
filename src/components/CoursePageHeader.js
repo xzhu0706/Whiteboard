@@ -1,17 +1,19 @@
 import React, {Component} from 'react';
+import '../styling/CoursePageHeader.css';
+
 
 class CoursePageHeader extends Component {
 
 	render() {
 		return(
-			<div>
-				<h1 className="course-name"> 
+			<div className="course-page-header-container">
+				<h2 className="course-name"> 
 					{this.props.courseInfo.courseName} {this.props.courseInfo.semester} {this.props.courseInfo.year} 
-				</h1>
+				</h2>
 
 				<div className="professor-contact-info">
-					<h3>{this.props.courseInfo.professorName}</h3>
-					<h3>{this.props.courseInfo.professorEmail}</h3>
+					<h2>Professor {this.props.courseInfo.professorName}</h2>
+					<h2>{this.props.courseInfo.professorEmail}</h2>
 				</div>
 			</div>
 		);

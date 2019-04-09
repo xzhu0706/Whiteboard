@@ -3,6 +3,8 @@ import cookie from 'react-cookies';
 import Announcements from './Annoucements.js';
 import SideBar from './SideBar.js';
 import CoursePageHeader from './CoursePageHeader.js';
+import {Container} from 'reactstrap';
+import '../styling/CoursePage.css'
 
 class CoursePage extends Component {
 	constructor(props) {
@@ -95,11 +97,9 @@ class CoursePage extends Component {
 	render() {
 		return (
 			<div className="container-fluid">
-
 				<CoursePageHeader courseInfo={this.state.courseInfo} />
 
 				<div className="row">
-
 					<div className="col-sm-4 d-flex justify-content-end">
 						<SideBar />
 					</div>
