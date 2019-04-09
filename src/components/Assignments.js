@@ -222,7 +222,6 @@ class Assignments extends Component {
 						/>
 						<Button 
 							className="other-button"
-							color="success"
 							onClick={(e) => {this.handleDownloadAssignment(e, this.state.selectedAssignment)}}
 						>
 							Download
@@ -260,13 +259,13 @@ class Assignments extends Component {
 					<div className="card-body">
 						{this.state.assignments}
 					</div>
-					{/* <Button 
+					<Button 
 						className="other-button"
 						color="success"
 						onClick={this.handleDownloadAssignment}
 					>
 						Download
-					</Button> */}
+					</Button>
 				</div>
 			);
 		}

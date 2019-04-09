@@ -118,24 +118,22 @@ class GradeBookTable extends Component {
       <div className="">
         <div 
           className="card smallcard" 
-          // onClick={(e) => this.props.onClick(e, this.props.id)}
           style = {{
-            backgroundColor: 'pink', 
+            backgroundColor: '#eae4c5', 
             width: 400+'px',
             margin: 0+' auto'
-            // borderColor: this.props.borderColor,
           }}
         >
-          <div className="header thumbnail">
-            Percentage
-          </div>
+          {/* <div className="percentage-header">
+            <h4 style={{fontWeight: 'bold'}}>Percentage</h4>
+          </div> */}
           <div className="card-body">
             {this.state.percentage}
           </div>
         </div>
 
         <div id="scrolltable">
-        <BootstrapTable data = {this.props.data.data} cellEdit={ cellEditProp } version='4' containerStyle={{width: colWidth, overflowX: 'scroll'}}>
+        <BootstrapTable data = {this.props.data.data} cellEdit={ cellEditProp } striped version='4' containerStyle={{width: colWidth, overflowX: 'scroll'}}>
           {this.state.columns}
         </BootstrapTable>
         </div>

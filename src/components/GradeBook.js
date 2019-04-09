@@ -103,7 +103,6 @@ class GradeBook extends Component {
 	}
 
   render() {
-		//TODO
 		if (this.props.isProf) {
 			return (
 				<div className="card gradebook-section">

@@ -34,7 +34,7 @@ class Card extends Component {
             }}
           >
             <div className="header thumbnail d-flex">
-              <Button className="jutify-content-sm-end" onClick={(e) => {this.props.handleSeeSubmissions(e, this.props.id)}}>Submissions</Button>
+              <Button className="jutify-content-sm-end" color="danger" onClick={(e) => {this.props.handleSeeSubmissions(e, this.props.id)}}>Submissions</Button>
             </div>
             <div className="card-title">
               {this.props.title}

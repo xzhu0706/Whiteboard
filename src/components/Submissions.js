@@ -15,7 +15,6 @@ class Submissions extends Component {
 	}
 
 	componentDidMount() {
-		//TODO
 		console.log('props for Submission component', this.props);
 		if (this.props.submissions.length > 0) {
 			const submissions = this.props.submissions.map((submission) => {
@@ -26,7 +25,7 @@ class Submissions extends Component {
 						isSubmission={true}
 						isSubmitted={submission.isSubmitted}
 						// isGraded={submission.isGraded}
-						grade={submission.grade}
+						grade={submission.assignmentGrade}
 						gradeTotal={submission.gradeTotal}
 						body={submission.content}
 						time={'Submitted at ' + submission.submitTime}
@@ -68,13 +67,12 @@ class Submissions extends Component {
 	// }
 
 	handleGradeSubmission(e, submissionID) {
-		//TODO
-		e.preventDefault();
+		// e.preventDefault();
 		console.log('enter grade for', submissionID);
 		if (e.target.grade.value >= 0) {
 			const data = {
 				submissionID: submissionID,
-				grade: e.target.grade.value,
+				assignmentGrade: e.target.grade.value,
 			}
 			console.log('data', data);
 			fetch('http://localhost:5000/api/gradeSubmission', {
@@ -82,7 +80,6 @@ class Submissions extends Component {
 				headers: {'Content-Type':'application/json'},
 				body: JSON.stringify(data)
 			}).then((res) => {
-
 				console.log(res)
 				if(res.ok) {
 					res.json().then(data => ({
@@ -90,15 +87,17 @@ class Submissions extends Component {
 						status: res.status
 					})).then(res => {
 						console.log(res);
+						if (res.data.update === false) {
+							alert('Fail to enter grade because no submission received. Please go to Grade Book to enter grade for non-received assignment.')
+						}
 					});
 				}
-				else{
+				else {
 					// window.location.replace("/error");
 					console.log('error while grading Submission')
 				}
 			});
 		}
-		window.location.reload();
 	}
 
 	handleDownloadSubmission(e) {
