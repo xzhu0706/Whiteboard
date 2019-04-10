@@ -58,7 +58,7 @@ def get_courseInfo(cursor, courseID):
 
 def get_Materials(cursor, courseID):
     qry = "SELECT materialID, material,postTime " \
-          "FROM ClassMaterial WHERE courseID = %(courseID)s ORDER BY postTime DESC;"
+          "FROM ClassMaterial WHERE courseID = %(courseID)s ORDER BY materialID DESC;"
     cursor.execute(qry, {"courseID": courseID})
 
     materialInfo = []
@@ -72,7 +72,7 @@ def get_Materials(cursor, courseID):
 
 def get_Announcement(cursor, courseID):
     qry = "SELECT announcementID, announcement,postTime " \
-          "FROM ClassAnnouncement WHERE courseID = %(courseID)s ORDER BY postTime DESC;"
+          "FROM ClassAnnouncement WHERE courseID = %(courseID)s ORDER BY announcementID DESC;"
     cursor.execute(qry, {"courseID": courseID})
 
     announcementInfo = []
@@ -90,7 +90,7 @@ def get_Assignments(cursor, courseID, ID):
 
 
     qry = "SELECT assignmentID, deadline,title, task,gradeTotal,postTime " \
-          "FROM Assignment WHERE courseID = %(courseID)s ORDER BY postTime DESC;"
+          "FROM Assignment WHERE courseID = %(courseID)s ORDER BY assignmentID DESC;"
     cursor.execute(qry, {"courseID": courseID})
 
     assignmentInfo = []
