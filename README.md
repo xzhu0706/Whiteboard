@@ -19,7 +19,7 @@ Clone and install packages and modules
 git clone https://github.com/xzhu0706/Whiteboard.git
 cd Whiteboard
 npm install
-pip3 install requirements.txt
+pip3 install -r requirements.txt
 ```
 
 Initialize the database by entering your localhost user and password in the CreateDatabase/SQLControl.py file, then run
