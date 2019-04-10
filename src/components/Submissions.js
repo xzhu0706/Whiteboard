@@ -91,13 +91,16 @@ class Submissions extends Component {
 					})).then(res => {
 						console.log(res);
 						if (res.data.update === false) {
-							alert('Fail to enter grade because no submission received. Please go to Grade Book to enter grade for non-received assignment.')
+							alert('Fail to enter grade because no submission received. Please go to Grade Book to enter grade for non-received assignment.');
+							window.location.reload();
 						}
 					});
 				}
 				else {
 					// window.location.replace("/error");
 					console.log('error while grading Submission')
+					alert('Something went wrong!');
+					window.location.reload();
 				}
 			});
 		}
@@ -105,7 +108,7 @@ class Submissions extends Component {
 
 	handleDownloadSubmission(e, submissionID) {
 		console.log('download submission', submissionID);
-		alert('Download feature is currently not avialable.');
+		alert('Download feature is currently not available.');
 		window.location.reload()
 		//TODO: if we implement uploading&downloading files 
 	}

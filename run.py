@@ -23,7 +23,7 @@ def login():
 	if id_type != -1:
 		return jsonify(id_type), 200
 	else:
-		return jsonify(authorization=False, message="Wrong username or password"), 200
+		return jsonify(authorization=False, message="Wrong username or password"), 403
 
 
 # @app.route("/api/courses/<userID>", methods=['GET'])

@@ -77,13 +77,16 @@ class Materials extends Component {
 						status: res.status
 					})).then(res => {
 						console.log(res);
+						window.location.reload();
 					});
 				} else {
 						console.log('error while deleting material');
+						alert('Something went wrong!');
+						window.location.reload();
 					}
 			});
-			window.location.reload();
-		}	}
+		}	
+	}
 
 	handleCreateMaterial(event, material) {
 //		event.preventDefault();
@@ -118,7 +121,7 @@ class Materials extends Component {
 
 	handleDownloadMaterial(e) {
 		console.log('download material', this.state.selectedMaterial);
-		alert('Download feature is currently not avialable.');
+		alert('Download feature is currently not available.');
 		window.location.reload()
 		//TODO: if we implement uploading&downloading files 
 	}

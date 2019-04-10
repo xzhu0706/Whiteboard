@@ -215,9 +215,9 @@ def get_grades(cursor, cnx, courseID,userID):
             return -1
         else:
             if finalGrade is not None:
-                gradeDict["final"] = round(finalGrade, 2)
+                gradeDict["finalGrade"] = round(finalGrade, 2)
             else:
-                gradeDict["final"] = finalGrade
+                gradeDict["finalGrade"] = finalGrade
 
 
 

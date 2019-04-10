@@ -20,10 +20,6 @@ class LoginPage extends Component {
 			username: this.state.username,
 			password: this.state.password,
 		};
-		if (loginData.username === '' || loginData.password === '') {
-			console.log('need all fields');
-			return;
-		}
 		// post API call to backend for login auth
 		fetch('http://localhost:5000/auth/login', {
 			method: 'POST',
@@ -67,7 +63,7 @@ class LoginPage extends Component {
 						className="form-control" 
 						name="username" 
 						placeholder="Username" 
-						required="" 
+						required
 						autofocus=""
 						onChange={(e) => { this.setState({ username: e.target.value})}}
 					/>
@@ -76,7 +72,7 @@ class LoginPage extends Component {
 						className="form-control" 
 						name="password" 
 						placeholder="Password" 
-						required=""
+						required
 						onChange={(e) => { this.setState({ password: e.target.value})}}
 					/>      
 					<button 

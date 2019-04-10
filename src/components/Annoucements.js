@@ -63,7 +63,8 @@ class Announcements extends Component {
 
 	handleDeleteAnnouncement(e) {
 		console.log('delete ancm', this.state.selectedAnnouncement);
-		if (this.state.selectedAnnouncement) {
+		e.preventDefault();
+		// if (this.state.selectedAnnouncement) {
 			fetch('http://localhost:5000/api/deleteAnnouncement/' + this.state.selectedAnnouncement, {
 				method: 'DELETE'
 			})
@@ -75,13 +76,16 @@ class Announcements extends Component {
 						status: res.status
 					})).then(res => {
 						console.log(res);
+						window.location.reload();
 					});
 				} else {
 						console.log('error while deleting announcement');
+						alert('Something went wrong!');
+						window.location.reload();
 					}
 			});
-			window.location.reload();
-		}	
+			// window.location.reload();
+		// }	
 	}
 
 	handleCreateAnnouncement(event, announcement) {

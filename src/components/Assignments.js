@@ -58,27 +58,30 @@ class Assignments extends Component {
 				selectedAssignment: assignmentID
 			});
 			// console.log(this.state.selectedAssignment);
-			if (this.props.assignments.length > 0) {
-				const assignments = this.props.assignments.map((assignment) => {
-					return (
-						<Card 
-							id={assignment.assignmentID}
-							isProf={this.props.isProf}
-							isAssignment={true}
-							pastDue={assignment.pastDue}
-							gradeTotal={assignment.gradeTotal}
-							title={assignment.title}
-							body={assignment.task}
-							time={"Deadline: " + assignment.deadline}
-							onClick={this.handleOnClickAssignment}
-							handleSubmitAssign={this.toggleSubmitAssignmentModal}
-							bgColor={assignmentID === assignment.assignmentID ? '#eae4c5' : '' }
-							handleSeeSubmissions={this.handleSeeSubmissions}
-							handleDownload={this.handleDownloadAssignment}
-						/>
-					);
-				})
-				this.setState({ assignments });
+			if (this.props.isProf) {
+				console.log('isProf');
+				if (this.props.assignments.length > 0) {
+					const assignments = this.props.assignments.map((assignment) => {
+						return (
+							<Card 
+								id={assignment.assignmentID}
+								isProf={this.props.isProf}
+								isAssignment={true}
+								pastDue={assignment.pastDue}
+								gradeTotal={assignment.gradeTotal}
+								title={assignment.title}
+								body={assignment.task}
+								time={"Deadline: " + assignment.deadline}
+								onClick={this.handleOnClickAssignment}
+								handleSubmitAssign={this.toggleSubmitAssignmentModal}
+								bgColor={assignmentID === assignment.assignmentID ? '#eae4c5' : '' }
+								handleSeeSubmissions={this.handleSeeSubmissions}
+								handleDownload={this.handleDownloadAssignment}
+							/>
+						);
+					})
+					this.setState({ assignments });
+				}
 			}
 		// }
 	}
@@ -98,12 +101,14 @@ class Assignments extends Component {
 						status: res.status
 					})).then(res => {
 						console.log(res);
+						window.location.reload();
 					});
 				} else {
 						console.log('error while deleting assignment');
+						alert('Something went wrong!');
+						window.location.reload();
 					}
 			});
-			window.location.reload();
 		}	}
 
 	handleCreateAssignment(event) {
@@ -142,12 +147,14 @@ class Assignments extends Component {
 	}
 
 	handleSubmitAssignment(e, submittedAssignment) {
+		// e.preventDefault();
 		console.log('submit assignment for', this.state.selectedAssignment);
 		const data = {
 			assignmentID: this.state.selectedAssignment,
 			studentID: cookie.load('userID'),
 			content: submittedAssignment
 		}
+		console.log(data);
 		fetch('http://localhost:5000/api/submitAssignment', {
 			method: 'POST',
 			headers: {'Content-Type':'application/json'},
@@ -161,11 +168,13 @@ class Assignments extends Component {
 					status: res.status
 				})).then(res => {
 					console.log(res);
+					window.location.reload();
 				});
 			}
 			else{
 				// window.location.replace("/error");
 				console.log('error while posting Assignment')
+				alert('Fail to submit, somthing went wrong');
 			}
 		});
 	}
@@ -177,7 +186,7 @@ class Assignments extends Component {
 
 	handleDownloadAssignment(e, assignmentID) {
 		console.log('download assignment', assignmentID);
-		alert('Download feature is currently not avialable.');
+		alert('Download feature is currently not available.');
 		window.location.reload()
 		//TODO: if we implement uploading&downloading files 
 	}
@@ -256,7 +265,6 @@ class Assignments extends Component {
 					</div>
 					<Button 
 						className="other-button"
-						color="success"
 						onClick={this.handleDownloadAssignment}
 					>
 						Download
