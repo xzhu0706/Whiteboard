@@ -39,8 +39,8 @@ def get_Courses(cursor, userID):
 def get_courseInfo(cursor, courseID):
     qry = "SELECT professorID,courseName, semester,year, firstName,lastName,email " \
           "FROM Users JOIN Courses ON Users.ID = Courses.professorID " \
-          "WHERE courseID = %(courseID)s ORDER BY year ASC,semester DESC;"
-    cursor.execute(qry, {"courseID": courseID})
+          "WHERE courseID = %s ORDER BY year ASC,semester DESC;" %courseID
+    cursor.execute(qry)
 
     courseInfo = {}
     for (professorID, courseName, semester, year, firstName, lastName, email) in cursor:

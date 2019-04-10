@@ -109,11 +109,14 @@ class Announcements extends Component {
 					status: res.status
 				})).then(res => {
 					console.log(res);
+					window.location.reload();
 				});
 			}
 			else{
 				// window.location.replace("/error");
 				console.log('error while posting announcement')
+				alert('Something went wrong!');
+				window.location.reload();
 			}
 
 		});
