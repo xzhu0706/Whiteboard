@@ -21,7 +21,7 @@ class HomePage extends Component {
 		let lastName = cookie.load('lastName');
 		this.setState({ userID, firstName, lastName });
 
-		fetch('http://localhost:5000/api/courses/' + userID)
+		fetch('/api/courses/' + userID)
 			.then((res) => {
 				console.log(res);
 				if (res.ok) {

@@ -34,7 +34,7 @@ class CoursePage extends Component {
 
     console.log(params);
 
-		await fetch('http://localhost:5000/api/courseInfo/' + params.courseID)
+		await fetch('/api/courseInfo/' + params.courseID)
 			.then((res) => {
 				console.log(res);
 				if (res.ok) {
@@ -56,7 +56,7 @@ class CoursePage extends Component {
 					}
 			})
 
-		await fetch('http://localhost:5000/api/announcement/' + params.courseID)
+		await fetch('/api/announcement/' + params.courseID)
 			.then((res) => {
 				console.log(res);
 				if (res.ok) {

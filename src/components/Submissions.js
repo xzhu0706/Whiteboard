@@ -78,7 +78,7 @@ class Submissions extends Component {
 				assignmentGrade: e.target.grade.value,
 			}
 			console.log('data', data);
-			fetch('http://localhost:5000/api/gradeSubmission', {
+			fetch('/api/gradeSubmission', {
 				method: 'POST',
 				headers: {'Content-Type':'application/json'},
 				body: JSON.stringify(data)

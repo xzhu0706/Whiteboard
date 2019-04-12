@@ -66,7 +66,7 @@ class Materials extends Component {
 		console.log('delete material', this.state.selectedMaterial);
 
 		if (this.state.selectedMaterial) {
-			fetch('http://localhost:5000/api/deleteMaterial/' + this.state.selectedMaterial, {
+			fetch('/api/deleteMaterial/' + this.state.selectedMaterial, {
 				method: 'DELETE'
 			})
 			.then((res) => {
@@ -96,7 +96,7 @@ class Materials extends Component {
 		}
 		console.log(data);
 
-		fetch('http://localhost:5000/api/createMaterial', {
+		fetch('/api/createMaterial', {
 			method: 'POST',
 			headers: {'Content-Type':'application/json'},
 			body: JSON.stringify(data)

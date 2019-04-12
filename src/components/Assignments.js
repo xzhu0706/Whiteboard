@@ -90,7 +90,7 @@ class Assignments extends Component {
 		console.log('delete assignment', this.state.selectedAssignment);
 		
 		if (this.state.selectedAssignment) {
-			fetch('http://localhost:5000/api/deleteAssignment/' + this.state.selectedAssignment, {
+			fetch('/api/deleteAssignment/' + this.state.selectedAssignment, {
 				method: 'DELETE'
 			})
 			.then((res) => {
@@ -123,7 +123,7 @@ class Assignments extends Component {
 		}
 		 console.log(data);
 
-		fetch('http://localhost:5000/api/createAssignment', {
+		fetch('/api/createAssignment', {
 			method: 'POST',
 			headers: {'Content-Type':'application/json'},
 			body: JSON.stringify(data)
@@ -155,7 +155,7 @@ class Assignments extends Component {
 			content: submittedAssignment
 		}
 		console.log(data);
-		fetch('http://localhost:5000/api/submitAssignment', {
+		fetch('/api/submitAssignment', {
 			method: 'POST',
 			headers: {'Content-Type':'application/json'},
 			body: JSON.stringify(data)

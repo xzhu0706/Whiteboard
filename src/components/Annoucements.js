@@ -65,7 +65,7 @@ class Announcements extends Component {
 		console.log('delete ancm', this.state.selectedAnnouncement);
 		e.preventDefault();
 		// if (this.state.selectedAnnouncement) {
-			fetch('http://localhost:5000/api/deleteAnnouncement/' + this.state.selectedAnnouncement, {
+			fetch('/api/deleteAnnouncement/' + this.state.selectedAnnouncement, {
 				method: 'DELETE'
 			})
 			.then((res) => {
@@ -96,7 +96,7 @@ class Announcements extends Component {
 		}
 		console.log(data);
 
-		fetch('http://localhost:5000/api/createAnnouncement', {
+		fetch('/api/createAnnouncement', {
 			method: 'POST',
 			headers: {'Content-Type':'application/json'},
 			body: JSON.stringify(data)

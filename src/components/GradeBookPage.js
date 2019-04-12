@@ -33,7 +33,7 @@ class GradeBookPage extends Component {
 		const courseID = courseInfo.courseID;
 		this.setState({ userID, userType, courseID, courseInfo });
 
-		fetch('http://localhost:5000/api/grade/' + courseID + '/' + userID)
+		fetch('/api/grade/' + courseID + '/' + userID)
 			.then((res) => {
 				console.log(res);
 				if (res.ok) {

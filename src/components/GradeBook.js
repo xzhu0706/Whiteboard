@@ -78,7 +78,7 @@ class GradeBook extends Component {
 		}
 		 console.log(data);
 
-		fetch('http://localhost:5000/api/createExam', {
+		fetch('/api/createExam', {
 			method: 'POST',
 			headers: {'Content-Type':'application/json'},
 			body: JSON.stringify(data)
