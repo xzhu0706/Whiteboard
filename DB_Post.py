@@ -155,7 +155,7 @@ def update_finalgrade(cursor,cnx, courseID, studentID):
 
     #  Get exam grade
     cursor.execute("SELECT examGrade,gradeTotal,examPercentage "
-                   "FROM  TakenClasses LEFT JOIN Exam "
+                   "FROM TakenClasses LEFT JOIN Exam "
                    "ON TakenClasses.courseID = Exam.courseID "
                    "LEFT JOIN ExamGrade ON Exam.examID = ExamGrade.examID "
                    "AND ExamGrade.studentID = TakenClasses.studentID "
