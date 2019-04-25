@@ -15,10 +15,10 @@ DELIMITER ;
 
 
 DELIMITER $$
-  CREATE PROCEDURE delAnnouncement(IN annID INTEGER)
-  BEGIN
-    DELETE FROM ClassAnnouncement where announcementID =  annID;
-  end $$
+CREATE PROCEDURE delAnnouncement(IN annID INTEGER)
+BEGIN
+  DELETE FROM ClassAnnouncement where announcementID =  annID;
+end $$
 DELIMITER ;
 
 

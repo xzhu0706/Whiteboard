@@ -1,6 +1,6 @@
 -- DROP DATABASE IF EXISTS Whiteboard;
 CREATE DATABASE IF NOT EXISTS Whiteboard;
-USE Whiteboard3;
+USE Whiteboard;
 DROP TABLE IF EXISTS ClassAnnouncement,ClassMaterial,ExamGrade;
 DROP TABLE IF EXISTS AssignmentGrade, AssignmentSubmission,Exam;
 DROP TABLE IF EXISTS Exam,Assignment,TakenClasses;

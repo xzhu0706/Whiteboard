@@ -80,7 +80,7 @@ DELIMITER $$
          FROM Assignment WHERE courseID = cID;
     ELSE SELECT assignmentID,deadline,title, task,gradeTotal,postTime,
                 pastDue, isLate,isSubmitted FROM assSubmit WHERE studentID =userID;
-    END IF ;
+    END IF;
   end $$
 DELIMITER ;
 -- CALL getAssignments(1,3);

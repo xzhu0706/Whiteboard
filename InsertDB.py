@@ -92,8 +92,8 @@ def create_random_takenClasses(cursor):
                 # print(index[i])
                 student = studentIDs[index[i]]
                 cursor.execute(qry, (student, course, estFinalGrade))
-        except mysql.connector.Error:
-            print("Error Create Class" )
+        except mysql.connector.Error as err:
+            print("Error Create Class: %s " % err )
             break
 
 
@@ -132,18 +132,18 @@ def create_random_AssignmentGrade(cursor):
         assignmentIDs.append(assignmentID)
         studentIDs.append(studentID)
 
-    qry = "UPDATE AssignmentGrade SET assignmentGrade = %s WHERE assignmentID = %s AND studentID = %s;"
+    qry = "INSERT INTO AssignmentGrade(assignmentID,studentID, assignmentGrade) VALUE (%s,%s,%s)"
 
     try:
         for i in range(len(studentIDs)):
-            # assignmentGrade = None
+            studentID = studentIDs[i]
+            assignmentID = assignmentIDs[i]
+            assignmentGrade = None
             if random.uniform(0, 1) < 0.3:
-                studentID = studentIDs[i]
-                assignmentID = assignmentIDs[i]
                 assignmentGrade = random.randint(60, 100)
-                cursor.execute(qry,(assignmentGrade,assignmentID,studentID))
-    except mysql.connector.Error:
-        print ("Error: create_random_AssignmentGrade")
+            cursor.execute(qry,(assignmentID,studentID,assignmentGrade))
+    except mysql.connector.Error as err:
+        print ("Error: create_random_AssignmentGrade %s " % err)
 
 
 
@@ -226,8 +226,8 @@ def create_random_ExamGrade(cursor):
             examID = examIDs[i]
             examGrade = random.randint(60, 100)
             cursor.execute(qry,(examID,studentID,examGrade))
-    except mysql.connector.Error:
-        print ("Error: create_random_AssignmentGrade")
+    except mysql.connector.Error as err:
+        print ("Error: create_random_ExamGrade %s "% err)
 
 
 
