@@ -42,13 +42,13 @@ class DB():
     def get_courseInfo(self, courseID):
         self.cursor.callproc('courseInfo',[courseID,])
         for result in self.cursor.stored_results():
-            info = result.fetchall()[0]
+            info = result.fetchall()
             if info:
                 return {"courseID": info[1], "courseName": info[2],
                         "semester": info[3], "year": info[4],
                         "professorID": info[0], "professorName": info[5]+" "+info[6],
                         "professorEmail": info[7]}
-        return -1
+            return -1
 
     def get_Materials(self, courseID):
         self.cursor.callproc('materialInfo',[courseID,])
@@ -112,7 +112,8 @@ class DB():
                 return submissionInfo
             return -1
     #
-    # def get_Grades(self, courseID, userID):
+    def get_Grades(self, courseID, userID):
+        return None
     #     self.cursor.callproc('getStudentInfo',[courseID,userID, ])
     #     for result in self.cursor.stored_results():
     #         info = result.fetchall()[0]
@@ -124,52 +125,59 @@ class DB():
     #     return -1
 
 
+    def updateDB(self, functionName, parameter):
+        try:
+            self.cursor.callproc(functionName,parameter)
+            self.cnx.commit()
+            return True
+        except mysql.connector.errors.IntegrityError as ERR:
+            print(ERR)
+            return False
+        except mysql.connector.errors.DataError as ERR:
+            print(ERR)
+            return False
+
     def uploadMaterial(self, courseID, material):
-        self.cursor.callproc('addMaterial',[courseID,material,])
-        self.cnx.commit()
+        return self.updateDB('addMaterial',[courseID,material])
 
 
     def makeAnnouncement(self, courseID, announcement):
-        self.cursor.callproc('addAnnouncement', [courseID, announcement, ])
-        self.cnx.commit()
+        return self.updateDB('addAnnouncement', [courseID, announcement])
 
     def addAssignment(self, courseID, deadline, title, task, gradeTotal):
-        self.cursor.callproc('addAssignment', [courseID, deadline,title, task, gradeTotal ])
-        self.cnx.commit()
+        return self.updateDB('addAssignment', [courseID, deadline,title, task, gradeTotal])
+
 
     def create_Exam(self, courseID, description, gradeTotal, examPercentage):
-        self.cursor.callproc('addExam', [courseID, description, gradeTotal, examPercentage])
-        self.cnx.commit()
+        return self.updateDB('addExam', [courseID, description, gradeTotal, examPercentage])
 
     def submit_Assignment(self, assignmentID, studentID, content):
-        self.cursor.callproc('addSubmission', [assignmentID, studentID, content])
-        self.cnx.commit()
+        return self.updateDB('addSubmission', [assignmentID, studentID, content])
+
 
     def submit_AssignmentGrade(self, assignmentID, studentID, assignmentGrade):
-        self.cursor.callproc('gradeAssignment', [assignmentID, studentID, assignmentGrade])
-        self.cnx.commit()
+        return self.updateDB('gradeAssignment', [assignmentID, studentID, assignmentGrade])
+
 
     def submit_SubmissionGrade(self, submissionID, assignmentGrade):
-        self.cursor.callproc('gradeSubmission', [submissionID, assignmentGrade])
-        self.cnx.commit()
+        return self.updateDB('gradeSubmission', [submissionID, assignmentGrade])
+
 
     def submit_ExamGrade(self, studentID, examID, examGrade):
-        self.cursor.callproc('gradeExam', [studentID, examID, examGrade])
-        self.cnx.commit()
+        return self.updateDB('gradeExam', [studentID, examID, examGrade])
 
 
     def del_Material(self, materialID):
-        self.cursor.callproc('delMaterial', [materialID])
-        self.cnx.commit()
+        return self.updateDB('delMaterial', [materialID])
+
 
     def del_Announcement(self, announcementID):
-        self.cursor.callproc('delAnnouncement', [announcementID])
-        self.cnx.commit()
+        return self.updateDB('delAnnouncement', [announcementID])
 
     def del_Assignment(self, assignmentID):
-        self.cursor.callproc('delAssignment', [assignmentID])
-        self.cnx.commit()
+        return self.updateDB('delAssignment', [assignmentID])
+
 
     def del_Exam(self, examID):
-        self.cursor.callproc('delExam', [examID])
-        self.cnx.commit()
+        return self.updateDB('delExam', [examID])
+

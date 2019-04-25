@@ -1,6 +1,6 @@
 from flask import Flask, jsonify,request
 from flask_cors import CORS
-from DB_init import db_User
+from DB_functions import DB
 import datetime
 
 app = Flask(__name__)
@@ -302,6 +302,6 @@ if __name__ == "__main__":
 		"database": 'Whiteboard'
 	}
 
-	User = db_User(config)
+	User = DB(config)
 	app.run()
 
