@@ -1,0 +1,19 @@
+Two ways to execute the files:
+
+1.login to mysql
+    -> mysql -u username -p
+2.execute each file:
+    -> source /path/to/file.sql;
+3. order to execute each file:
+    -> source ResetDB.sql
+    -> source tableSchema.sql
+    -> source Views.sql
+    -> source Triggers.sql
+    -> source storefunctions.sql
+    -> source deleteProcedure.sql
+    -> source insertProcedure.sql
+    -> source getProcedure.sql
+4. exit mysql and execute python file,
+    -> enter username and password to createDB.py
+    -> python3 CreateDB.py
+5. enter username and password to run.py to start the backend

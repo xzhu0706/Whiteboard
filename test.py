@@ -9,20 +9,7 @@ config = {
     "database": 'Whiteboard'
 }
 
-# cnx = mysql.connector.connect(**config)
-# cursor = cnx.cursor(buffered=True)
-# cursor.callproc('getGrade', [1, 10, ])
-# results = cursor.stored_results()
-# allinfo=[]
-# for res in results:
-#     allinfo.append(res.fetchall())
-#
-# if len(allinfo[0]) == 1:     #student
-#     pass
-# for info in allinfo[0]:
-
 User = DB(config)
-
 # grade = User.get_Grades(1,10)
 usr = User.login_check('Frances948','1oeq955wq8')
 
@@ -64,4 +51,3 @@ delAnn = User.del_Announcement(55)
 delAss = User.del_Assignment(44)
 
 delEx = User.del_Exam(77)
-print()

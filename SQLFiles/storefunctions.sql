@@ -1,6 +1,5 @@
-USE Whiteboard;
 DROP FUNCTION IF EXISTS getFinalGrade;
-
+USE Whiteboard;
 
 -- function for update final grade
 DELIMITER //
@@ -13,8 +12,10 @@ BEGIN
   DECLARE finalGrade FLOAT;
 
   SELECT assignmentPercentage INTO assPer FROM Courses WHERE courseID = cID;
-  SELECT SUM(examPercentage) INTO examPer FROM Exam WHERE courseID = cID;
+  SELECT SUM(examPercentage) INTO examPer FROM compareExam
+  WHERE courseID = cID AND studentID = sID AND examPerent is not NULL;
 
+  -- RETURN examPer;
   SELECT SUM(assGrade)/COUNT(*) INTO assTotal FROM compareAssignment
   WHERE courseID = cID AND studentID = sID AND assGrade is not NULL;
 
@@ -36,7 +37,7 @@ BEGIN
 end //
 DELIMITER ;
 
--- SET @final = getFinalGrade(2,46);
+-- SET @final = getFinalGrade(2,2);
 -- SELECT @final;
 
 -- SELECT SUM(assGrade)/COUNT(*) FROM compareAssignment WHERE courseID = 2 AND studentID = 46 AND assGrade is not NULL; -- 0.97

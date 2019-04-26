@@ -5,10 +5,7 @@ DROP PROCEDURE IF EXISTS materialInfo;
 DROP PROCEDURE IF EXISTS announcementInfo;
 DROP PROCEDURE IF EXISTS getAssignments;
 DROP PROCEDURE IF EXISTS getSubmission;
-DROP PROCEDURE IF EXISTS getAssGrade;
-DROP PROCEDURE IF EXISTS getExGrade;
-DROP PROCEDURE IF EXISTS getStudentInfo;
-
+DROP PROCEDURE IF EXISTS getGrade;
 USE Whiteboard;
 
 DELIMITER $$
@@ -16,7 +13,7 @@ DELIMITER $$
   BEGIN
     SELECT ID, userType, firstName, lastName
     FROM Users WHERE userName = name AND password= pw ;
-  end $$
+  end; $$
 DELIMITER ;
 -- CALL Login('Ada386','yph8v87cag');
 
@@ -41,7 +38,7 @@ DELIMITER ;
 DELIMITER $$
   CREATE PROCEDURE courseInfo(IN cID INTEGER)
   BEGIN
-    SELECT professorID,courseName, semester,year, firstName,lastName,email
+    SELECT professorID,courseID,courseName, semester,year, firstName,lastName,email
       FROM Users JOIN Courses ON Users.ID = Courses.professorID
     WHERE courseID = cID ORDER BY year ASC,semester DESC;
   end $$
@@ -80,7 +77,7 @@ DELIMITER $$
          FROM Assignment WHERE courseID = cID;
     ELSE SELECT assignmentID,deadline,title, task,gradeTotal,postTime,
                 pastDue, isLate,isSubmitted FROM assSubmit WHERE studentID =userID;
-    END IF;
+    END IF ;
   end $$
 DELIMITER ;
 -- CALL getAssignments(1,3);
@@ -104,42 +101,36 @@ DELIMITER ;
 
 -- def   get_grades
 DELIMITER $$
-  CREATE PROCEDURE getAssGrade(IN cID INTEGER, IN uID INTEGER)
+  CREATE PROCEDURE getGrade(IN cID INTEGER, IN uID INTEGER)
   BEGIN
-    IF EXISTS(SELECT * FROM Users WHERE userType = 1 AND ID = uID)
-      THEN SELECT studentID,assignmentID,title,gradeTotal,assGrade FROM compareassignment WHERE courseID = cID;
+    IF EXISTS(SELECT * FROM Users WHERE userType = 0 AND ID = uID)
+      THEN
+        SELECT U.ID,firstName,lastName,estFinalGrade, assignmentPercentage FROM Users U
+          JOIN TakenClasses T ON U.ID =T.studentID AND U.ID = uID
+          JOIN Courses ON T.courseID = Courses.courseID;
+
+        SELECT assignmentID,title,gradeTotal,assGrade*gradeTotal FROM compareassignment
+        WHERE courseID = cID AND studentID = uID;
+
+        SELECT examID, gradeTotal, examPercentage, description AS title,
+        examPerent/examPercentage*gradeTotal AS examGrade FROM compareexam
+        WHERE courseID = cID AND studentID = uID;
+
+
     ELSE
-      SELECT assignmentID,title,gradeTotal,assGrade FROM compareassignment
-      WHERE courseID = cID AND studentID = uID;
-    END IF;
+      SELECT U.ID,firstName,lastName,estFinalGrade,assignmentPercentage FROM Users U
+          JOIN TakenClasses T ON U.ID =T.studentID AND T.courseID = cID
+          JOIN Courses ON T.courseID = Courses.courseID ORDER BY U.ID ASC ;
+
+      SELECT studentID,assignmentID,title,gradeTotal,assGrade*gradeTotal FROM compareassignment
+      WHERE courseID = cID ORDER BY studentID ASC ;
+
+      SELECT examID, studentID, gradeTotal, examPercentage, description AS title,
+                        examPerent/examPercentage*gradeTotal AS examGrade FROM compareexam
+                        WHERE courseID = cID and studentID is not NULL ORDER BY studentID ASC;
+    end if;
   end $$
 DELIMITER ;
+-- CALL getGrade(1,10);
 
-DELIMITER $$
-  CREATE PROCEDURE getExGrade(IN cID INTEGER, IN uID INTEGER)
-  BEGIN
-    IF EXISTS(SELECT * FROM Users WHERE userType = 1 AND ID = uID)
-      THEN SELECT examID, studentID, gradeTotal, examPercentage, description AS title,
-                  examPerent/examPercentage*gradeTotal AS examGrade FROM compareexam
-                  WHERE courseID = cID;
-    ELSE SELECT examID, gradeTotal, examPercentage, description AS title,
-                  examPerent/examPercentage*gradeTotal AS examGrade FROM compareexam
-                  WHERE courseID = cID AND studentID = uID;
-    END IF;
-  end $$
-DELIMITER ;
-
-DELIMITER $$
-  CREATE PROCEDURE getStudentInfo(IN cID INTEGER, IN sID INTEGER)
-  BEGIN
-    DECLARE finalG FLOAT;
-    SET finalG = getFinalGrade(cID,sID);
-
-    SELECT studentID, firstName, lastName, finalG AS finalGrade
-    FROM Users JOIN TakenClasses ON ID = studentID WHERE courseID = cID AND studentID = sID;
-
-  end $$
-DELIMITER ;
--- CALL getStudentInfo(2,44)
--- SELECT firstName,lastName FROM Users WHERE ID = 1
 
