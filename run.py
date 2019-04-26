@@ -6,6 +6,16 @@ import datetime
 app = Flask(__name__)
 CORS(app, support_credentials=True)
 
+config = {
+	"user": '',
+	"password": '',
+	"host": '127.0.0.1',
+	"database": 'Whiteboard'
+}
+
+User = DB(config)
+
+
 #-------------------------------------------- Check in with DB -------------------------------------------------------#
 # @app.route("/auth/login", methods=['GET'])
 # given: username, password
@@ -182,7 +192,7 @@ def createAss():
 	gradeTotal = json_load['gradeTotal']
 
 	# boolean value of update in DB or not
-	boolean = User.createAssignment(courseID,deadline,title,task,gradeTotal)
+	boolean = User.addAssignment(courseID,deadline,title,task,gradeTotal)
 
 	return jsonify(update=boolean)
 
@@ -258,7 +268,6 @@ def gradeExam():
 	return jsonify(update=boolean)
 
 
-
 #------------------------------ Delete Material/Announcement/Assignment/Exam --------------------------------#
 
 @app.route('/api/deleteAnnouncement/<announcementID>', methods=['DELETE'])
@@ -295,13 +304,5 @@ def delExam(examID):
 
 
 if __name__ == "__main__":
-	config = {
-		"user": '',
-		"password": '',
-		"host": '127.0.0.1',
-		"database": 'Whiteboard'
-	}
-
-	User = DB(config)
 	app.run()
 

@@ -16,7 +16,6 @@ class DB():
                 print(err)
             raise err
 
-
 # Get info from DB
     def login_check(self, username, password):
         self.cursor.callproc('getLogin',[username,password,])
@@ -42,7 +41,7 @@ class DB():
     def get_courseInfo(self, courseID):
         self.cursor.callproc('courseInfo',[courseID,])
         for result in self.cursor.stored_results():
-            info = result.fetchall()
+            info = result.fetchall()[0]
             if info:
                 return {"courseID": info[1], "courseName": info[2],
                         "semester": info[3], "year": info[4],
@@ -103,7 +102,7 @@ class DB():
                 for info in infos:
                     submissionInfo.append({'submissionID': info[1], 'studentID': info[0],
                                         'content': info[2], 'gradeTotal': info[3],
-                                        'submitTime': info[4].strftime("%m/%d/%Y, %H:%M:%S"),
+                                        'submitTime': info[4].strftime("%m/%d/%Y, %H:%M:%S") if info[4] is not None else info[4],
                                         'assignmentGrade':info[7],
                                         'studentName': info[5] + ' ' + info[6],
                                         'isSubmitted': info[9], 'isGraded': info[11],
@@ -111,18 +110,6 @@ class DB():
                                         })
                 return submissionInfo
             return -1
-    #
-    def get_Grades(self, courseID, userID):
-        return None
-    #     self.cursor.callproc('getStudentInfo',[courseID,userID, ])
-    #     for result in self.cursor.stored_results():
-    #         info = result.fetchall()[0]
-    #         if info:
-    #             return {"courseID": info[1], "courseName": info[2],
-    #                     "semester": info[3], "year": info[4],
-    #                     "professorID": info[0], "professorName": info[5]+" "+info[6],
-    #                     "professorEmail": info[7]}
-    #     return -1
 
 
     def updateDB(self, functionName, parameter):
@@ -138,13 +125,20 @@ class DB():
             return False
 
     def uploadMaterial(self, courseID, material):
+        print("MAL")
+        print(courseID, material)
+
         return self.updateDB('addMaterial',[courseID,material])
 
-
     def makeAnnouncement(self, courseID, announcement):
+        print("Ann")
+        print( courseID, announcement)
+
         return self.updateDB('addAnnouncement', [courseID, announcement])
 
     def addAssignment(self, courseID, deadline, title, task, gradeTotal):
+        print("ASS")
+        print(courseID, deadline, title, task, gradeTotal)
         return self.updateDB('addAssignment', [courseID, deadline,title, task, gradeTotal])
 
 
@@ -154,18 +148,16 @@ class DB():
     def submit_Assignment(self, assignmentID, studentID, content):
         return self.updateDB('addSubmission', [assignmentID, studentID, content])
 
-
     def submit_AssignmentGrade(self, assignmentID, studentID, assignmentGrade):
+        print("ASS Grade")
+        print(assignmentID, studentID, assignmentGrade)
         return self.updateDB('gradeAssignment', [assignmentID, studentID, assignmentGrade])
-
 
     def submit_SubmissionGrade(self, submissionID, assignmentGrade):
         return self.updateDB('gradeSubmission', [submissionID, assignmentGrade])
 
-
     def submit_ExamGrade(self, studentID, examID, examGrade):
         return self.updateDB('gradeExam', [studentID, examID, examGrade])
-
 
     def del_Material(self, materialID):
         return self.updateDB('delMaterial', [materialID])
@@ -181,3 +173,64 @@ class DB():
     def del_Exam(self, examID):
         return self.updateDB('delExam', [examID])
 
+
+
+    def get_Grades(self, courseID, userID):
+        self.cursor.callproc('getGrade', [courseID, userID, ])
+        results = self.cursor.stored_results()
+        allinfo = []
+        for res in results:
+            allinfo.append(res.fetchall())
+
+        if len(allinfo[0]) == 1:  # student
+            if allinfo[0][0][3] is not None:
+                allinfo[0][0][3] = round(allinfo[0][0][3], 2)
+            gradeDict = {"studentID": allinfo[0][0][0], "name": allinfo[0][0][1]+" "+allinfo[0][0][2],
+                        "assignment": [], "assignmentPercentage": allinfo[0][0][4],
+                        "exam": [], "finalGrade": allinfo[0][0][3]}
+            for i in range(len(allinfo[1])):
+                gradeDict["assignment"].append({"assignmentID": allinfo[1][i][1], "assignmentTitle": allinfo[1][i][2],
+                                                "assignmentGrade": allinfo[1][i][4], "gradeTotal": allinfo[1][i][3]})
+            for i in range(len(allinfo[2])):
+                gradeDict["exam"].append({"examID": allinfo[2][i][0], "examTitle": allinfo[2][i][4],
+                                         "examGrade": allinfo[2][i][5], "examPercentage": allinfo[2][i][3],
+                                         "gradeTotal": allinfo[2][i][2]})
+        else:
+            gradeDict = {"percentage": {}, "gradeTotal": {}, "title": {}, "data": []}
+            gradeDict["percentage"]["assignmentPercentage"] = allinfo[0][0][4]
+            asget,exget = True, True
+
+            asI,exI = 0,0
+            print(len(allinfo[1]))
+            print(len(allinfo[2]))
+            for sIndex in range(len(allinfo[0])):
+                final = allinfo[0][sIndex][3]
+                final = round(final, 2) if final is not None else final
+
+                studentGrade = {"ID": allinfo[0][sIndex][0],
+                                "name": allinfo[0][sIndex][1] + " " + allinfo[0][sIndex][2],
+                                "final": final}
+
+                while asI < len(allinfo[1]) and allinfo[1][asI][0] == studentGrade["ID"]:
+                    aID = allinfo[1][asI][1]
+                    assName = "as0" + str(aID) if aID < 10 else "as" + str(aID)
+                    studentGrade[assName] = allinfo[1][asI][4]
+                    if asget:
+                        gradeDict["gradeTotal"][assName] = allinfo[1][asI][3]
+                        gradeDict["title"][assName] = allinfo[1][asI][2]
+                    asI+=1
+
+                while exI <len(allinfo[2]) and allinfo[2][exI][1] == studentGrade["ID"]:
+                    exID = allinfo[2][exI][0]
+                    examName = "ex0" + str(exID) if exID < 10 else "ex" + str(exID)
+                    studentGrade[examName] = allinfo[2][exI][5]
+                    if exget:
+                        gradeDict["gradeTotal"][examName] = allinfo[2][exI][2]
+                        gradeDict["title"][examName] = allinfo[2][exI][4]
+                        gradeDict["percentage"][examName] = allinfo[2][exI][3]
+                    exI+=1
+                gradeDict['data'].append(studentGrade)
+                asget,exget = False,False
+        if not gradeDict:
+            return -1
+        return gradeDict
