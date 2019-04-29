@@ -14,11 +14,11 @@ class SideBar extends Component {
 	}
 
 	componentDidMount() {
-		const courseInfo = cookie.load('courseInfo'); // get courseInfo from cookie
-		const courseID = courseInfo.courseID;
+		// const courseInfo = cookie.load('courseInfo'); // get courseInfo from cookie
+		// const courseID = courseInfo.courseID;
 		const userID = cookie.load('userID');
 		const userType = cookie.load('userType');
-		this.setState({ courseID, userID, userType })
+		this.setState({ userID, userType })
 	}
 
 	handleLogOut() {
@@ -34,9 +34,9 @@ class SideBar extends Component {
 				<Button className="side-bar-button" color="primary" onClick={(e) => {window.location = '/home/' + this.state.userID}}>Home</Button>
 				<div></div>
 				<Button className="side-bar-button" color="warning" onClick={(e) => {window.location = '/course/' + cookie.load('courseInfo').courseID}}>Announcements</Button>
-				<Button className="side-bar-button" color="dark" onClick={(e) => {window.location = '/materials/' + this.state.courseID}}>Materials</Button>
-				<Button className="side-bar-button" color="success" onClick={(e) => {window.location = '/assignments/' + this.state.courseID}}>Assignments</Button>
-				<Button className="side-bar-button" color="danger" onClick={(e) => {window.location = '/gradebook/' + this.state.courseID + '/' + this.state.userID}}>
+				<Button className="side-bar-button" color="dark" onClick={(e) => {window.location = '/materials/' + cookie.load('courseInfo').courseID}}>Materials</Button>
+				<Button className="side-bar-button" color="success" onClick={(e) => {window.location = '/assignments/' + cookie.load('courseInfo').courseID}}>Assignments</Button>
+				<Button className="side-bar-button" color="danger" onClick={(e) => {window.location = '/gradebook/' + cookie.load('courseInfo').courseID + '/' + this.state.userID}}>
 					{this.state.userType === '1' ? 'GradeBook' : 'My Grades'}
 				</Button>
 				<Button className="side-bar-button" onClick={this.handleLogOut}>Log Out</Button>

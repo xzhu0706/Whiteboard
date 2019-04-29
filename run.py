@@ -21,7 +21,7 @@ User = DB(config)
 # given: username, password
 # return: dict of (ID, userType, firstName, lastName) if correct login
 # 		  message if login info not correct
-@app.route("/auth/login", methods=['POST'])
+@app.route("/api/auth/login", methods=['POST'])
 def login():
 	json_load = request.get_json()
 

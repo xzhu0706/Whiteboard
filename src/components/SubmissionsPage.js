@@ -36,7 +36,7 @@ class SubmissionsPage extends Component {
 		const assignmentID = params.assignmentID;
 		this.setState({ userID, userType, courseID, courseInfo, assignmentID });
 
-		fetch('http://localhost:5000/api/submissions/' + assignmentID)
+		fetch('/api/submissions/' + assignmentID)
 			.then((res) => {
 				console.log(res);
 				if (res.ok) {

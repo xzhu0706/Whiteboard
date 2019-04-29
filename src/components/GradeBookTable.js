@@ -53,7 +53,7 @@ class GradeBookTable extends Component {
         assignmentGrade: cellValue
       }
       console.log('data', data);
-      fetch('http://localhost:5000/api/gradeAssignment', {
+      fetch('/api/gradeAssignment', {
           method: 'POST',
           headers: {'Content-Type':'application/json'},
           body: JSON.stringify(data)
@@ -83,7 +83,7 @@ class GradeBookTable extends Component {
         examGrade: cellValue
       }
       console.log('data', data);
-      fetch('http://localhost:5000/api/gradeExam', {
+      fetch('/api/gradeExam', {
           method: 'POST',
           headers: {'Content-Type':'application/json'},
           body: JSON.stringify(data)

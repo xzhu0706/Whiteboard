@@ -21,7 +21,7 @@ class LoginPage extends Component {
 			password: this.state.password,
 		};
 		// post API call to backend for login auth
-		fetch('http://localhost:5000/auth/login', {
+		fetch('/api/auth/login', {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(loginData)

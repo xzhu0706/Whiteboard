@@ -33,7 +33,7 @@ class AssignmentsPage extends Component {
 		const courseID = courseInfo.courseID; // get params from url
 		this.setState({ userID, userType, courseID, courseInfo });
 
-		fetch('http://localhost:5000/api/assignments/' + courseID + '/' + userID)
+		fetch('/api/assignments/' + courseID + '/' + userID)
 			.then((res) => {
 				console.log(res);
 				if (res.ok) {
