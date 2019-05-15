@@ -22,9 +22,15 @@ npm install
 pip3 install -r requirements.txt
 ```
 
-Initialize the database by entering your localhost user and password in the CreateDatabase/SQLControl.py file, then run
+Start the mysql server, then log in and run the AllScript.sql file
 ```
-python3 CreateDatabase/SQLControl.py
+mysql -u <your username> -p<your password>
+source AllScript.sql
+```
+
+Initialize the database by entering your localhost user and password in the CreateDB.py file, then run
+```
+python3 CreateDB.py
 ```
 
 Start the frontend
